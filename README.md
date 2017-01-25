@@ -1,4 +1,9 @@
 # CommandShop
 Players have to pay items or money to use specific commands! A PocketMine plugin.
 
-<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+By BoxOfDevs:
+
+![BoxOfDevs Banner](http://files.himbeer.me/bod-banner.gif)
+
+## License
+This work is licensed under the BoxOfDevs General Software License 1.1.1
