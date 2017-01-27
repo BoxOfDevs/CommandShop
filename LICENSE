@@ -1,8 +1,8 @@
-BoxOfDevs General Software License 1.1.1
+BoxOfDevs General Software License 1.1.2
 =========================================
-This license is designed to be used with any free open source softwares. It can be found @ https://products.boxofdevs.com/.
+This license is designed to be used with any software which would like to have no selling for profits, nor any public redistribution without giving the original author credits.
 --------------------------------------------------------------------------------------------------------------------------------------
-The License: refers to the BoxOfDevs International Software License 1.1.1
+The License: refers to the BoxOfDevs International Software License 1.1.2
 The Software: refers to any works licensed under The License.
 The Modification: refers to any modified version of The Software.
 The Redistribution: refers to any redistributions of The Software/The Modification.
@@ -31,10 +31,10 @@ Section 2 - Restrictions:
 		a. Restrict The User in any way not specified by The License.
 		b. Distribute any form of The Software without proper documentation.
         Term. The term of this Public License is specified in Section 6(a).
-        Media and formats; technical modifications allowed. The Licensor authorizes You to exercise the Licensed Rights in all media and formats whether now known or hereafter created, and to make technical modifications necessary to do so. The Licensor waives and/or agrees not to assert any right or authority to forbid You from making technical modifications necessary to exercise the Licensed Rights, including technical modifications necessary to circumvent Effective Technological Measures. For purposes of this Public License, simply making modifications authorized by this Section 2(a)(4) never produces Adapted Material.
+        Media and formats; technical modifications allowed. The Licensor authorizes You to exercise the Licensed Rights in all media and formats whether now known or hereafter created, and to make technical modifications necessary to do so. The Licensor waives and/or agrees not to assert any right or authority to forbid You from making technical modifications necessary to exercise the Licensed Rights, including technical modifications necessary to circumvent Effective Technological Measures. For purposes of this Public License, simply making modifications authorized by this Section 2(a)(4) never produces Modification.
         Downstream recipients.
             Offer from the Licensor – Licensed Material. Every recipient of the Licensed Material automatically receives an offer from the Licensor to exercise the Licensed Rights under the terms and conditions of this Public License.
-            Additional offer from the Licensor – Adapted Material. Every recipient of Adapted Material from You automatically receives an offer from the Licensor to exercise the Licensed Rights in the Adapted Material under the conditions of the Adapter’s License You apply.
+            Additional offer from the Licensor – the Modification. Every recipient of the Modification from You automatically receives an offer from the Licensor to exercise the Licensed Rights in the Modification under the conditions of the Adapter’s License You apply.
             No downstream restrictions. You may not offer or impose any additional or different terms or conditions on, or apply any Effective Technological Measures to, the Licensed Material if doing so restricts exercise of the Licensed Rights by any recipient of the Licensed Material.
         No endorsement. Nothing in this Public License constitutes or may be construed as permission to assert or imply that You are, or that Your use of the Licensed Material is, connected with, or sponsored, endorsed, or granted official status by, the Licensor or others designated to receive attribution as provided in Section 3(a)(1)(A)(i).
 
@@ -47,7 +47,7 @@ Section 3 – License Conditions.
 
 Your exercise of the Licensed Rights is expressly made subject to the following conditions.
 
-    Attribution.
+    a) Attribution.
 
         If You Share the Licensed Material (including in modified form), You must:
             retain the following if it is supplied by the Licensor with the Licensed Material:
@@ -60,19 +60,33 @@ Your exercise of the Licensed Rights is expressly made subject to the following 
             indicate the Licensed Material is licensed under this Public License, and include the text of, or the URI or hyperlink to, this Public License.
         You may satisfy the conditions in Section 3(a)(1) in any reasonable manner based on the medium, means, and context in which You Share the Licensed Material. For example, it may be reasonable to satisfy the conditions by providing a URI or hyperlink to a resource that includes the required information.
         If requested by the Licensor, You must remove any of the information required by Section 3(a)(1)(A) to the extent reasonably practicable.
-    ShareAlike.
+    
+    b) ShareAlike.
 
-    In addition to the conditions in Section 3(a), if You Share Adapted Material You produce, the following conditions also apply.
-        The Adapter’s License You apply must be a Creative Commons license with the same License Elements, this version or later, or a BY-SA Compatible License.
-        You must include the text of, or the URI or hyperlink to, the Adapter's License You apply. You may satisfy this condition in any reasonable manner based on the medium, means, and context in which You Share Adapted Material.
-        You may not offer or impose any additional or different terms or conditions on, or apply any Effective Technological Measures to, Adapted Material that restrict exercise of the rights granted under the Adapter's License You apply.
+    In addition to the conditions in Section 3(a), if You Share the Modification You produce, the following conditions also apply.
+        The Adapter’s License You apply must be a BoxOfDevs General License with the same License Elements, this version or later, or a BY-SA Compatible License.
+        You must include the text of, or the URI or hyperlink to, the Adapter's License You apply. You may satisfy this condition in any reasonable manner based on the medium, means, and context in which You Share the Modification.
+        You may not offer or impose any additional or different terms or conditions on, or apply any Effective Technological Measures to, Modification that restrict exercise of the rights granted under the Adapter's License You apply.
+
+    c) Forever Open Source.
+
+    In addition to the conditions in Section 3(a) and Section 3(b), if You Share the Modification You produce, the following conditions also apply.
+    The Adapted work must have an open source existing repertory, accessible by anyone anytime linked in the Redistribution Description/Documentation.
+    You may not restrict anyone from accessing the source code, use it, and redistribute it under anything not explicily specified by the License.
+    
+    d) Free.
+    
+    In addition to the conditions in Section 3(a), Section 3(b) and Section 3(c), if You Share by any way Modification and/or the Software You produce, the following conditions also apply.
+    The Work must be redistributed entierly free, under this license.
+    You may not impose fees to anyone that gets the Modification/The Software.
+    
 
 Section 4 – Sui Generis Database Rights.
 
 Where the Licensed Rights include Sui Generis Database Rights that apply to Your use of the Licensed Material:
 
     for the avoidance of doubt, Section 2(a)(1) grants You the right to extract, reuse, reproduce, and Share all or a substantial portion of the contents of the database;
-    if You include all or a substantial portion of the database contents in a database in which You have Sui Generis Database Rights, then the database in which You have Sui Generis Database Rights (but not its individual contents) is Adapted Material, including for purposes of Section 3(b); and
+    if You include all or a substantial portion of the database contents in a database in which You have Sui Generis Database Rights, then the database in which You have Sui Generis Database Rights (but not its individual contents) is Modification, including for purposes of Section 3(b); and
     You must comply with the conditions in Section 3(a) if You Share all or a substantial portion of the contents of the database.
 
 For the avoidance of doubt, this Section 4 supplements and does not replace Your obligations under this Public License where the Licensed Rights include other Copyright and Similar Rights.
@@ -99,7 +113,9 @@ Section 7 – Other Terms and Conditions.
 
     The Licensor shall not be bound by any additional or different terms or conditions communicated by You unless expressly agreed.
     Any arrangements, understandings, or agreements regarding the Licensed Material not stated herein are separate from and independent of the terms and conditions of this Public License.
-
+    In the event that The License is updated/changed on the official github repository/on the official website, you automatically agree.
+    The Author is not required to notify The User that The License has been updated/changed.
+    
 Section 8 – Interpretation.
 
     For the avoidance of doubt, this Public License does not, and shall not be interpreted to, reduce, limit, restrict, or impose conditions on any use of the Licensed Material that could lawfully be made without permission under this Public License.
