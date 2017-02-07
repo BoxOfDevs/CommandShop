@@ -1,0 +1,7 @@
+---
+# Config and command-database for CommandShop by BoxOfDevs:
+
+commands:
+  example:
+    cmd: "tp {player} 123 123 123"
+...
