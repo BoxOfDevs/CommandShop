@@ -4,4 +4,10 @@
 commands:
   example:
     cmd: "tp {player} 123 123 123"
+    price:
+      paytype: "item"
+      item: "1:0:64"
+    
+signs:
+
 ...
