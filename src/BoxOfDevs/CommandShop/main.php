@@ -177,7 +177,7 @@ class main extends PluginBase implements Listener{
                                         $cmds[$cmd]["price"]["paytype"] = "item";
                                         $cmds[$cmd]["price"]["item"] = $item;
                                         $this->getConfig()->set("commands", $cmds);
-                                        $sender->sendMessage(self::PREFIX . TF::GREEN . "The item-price of $item has successfully been set to the command $cmd!")
+                                        $sender->sendMessage(self::PREFIX . TF::GREEN . "The item-price of $item has successfully been set to the command $cmd!");
                                    }else{
                                         $sender->sendMessage(self::ERROR . "Command $cmd couldn't be found!");
                                    }
