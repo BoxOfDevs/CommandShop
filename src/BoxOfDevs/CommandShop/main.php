@@ -203,7 +203,7 @@ class main extends PluginBase implements Listener{
           foreach($signs as $s){
                if($s["x"] === $x && $s["y"] === $y && $s["z"] === $z){
                     if($p->hasPermission("cshop.buy.sign")){
-                         $this->buyCmd($s["cmd"], $p));
+                         $this->buyCmd($s["cmd"], $p);
                     }else{
                          $p->sendMessage(self::ERROR . "You don't have the permission to buy commands via signs!");
                     }
