@@ -129,7 +129,7 @@ class main extends PluginBase implements Listener{
                          case "add":
                               if(count($args) < 2) return false;
                               $name = strtolower(array_shift($args));
-                              $cmd = strtolower(implode(" ", $args));1
+                              $cmd = strtolower(implode(" ", $args));
                               $cmds = $this->getConfig()->get("commands", []);
                               $cmds[$name]["cmd"] = $cmd;
                               $this->getConfig()->set("commands", $cmds);
