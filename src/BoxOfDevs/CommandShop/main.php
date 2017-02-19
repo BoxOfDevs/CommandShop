@@ -91,7 +91,7 @@ class main extends PluginBase implements Listener{
                                    $this->getLogger()->debug("The player $name has bought the command $cmd for $amount $unit via EconomyAPI.");
                                    return true;
                               }else{
-                                   $p->sendMessage(self::ERROR . "You don't have enough money to buy this command. You would need $amount $unit!")
+                                   $p->sendMessage(self::ERROR . "You don't have enough money to buy this command. You would need $amount $unit!");
                               }
                          }else{
                               $msg = self::ERROR . "Command couldn't be bought because EconomyAPI isn't loaded.";
