@@ -163,7 +163,7 @@ class main extends PluginBase implements Listener{
                                              $cmds[$cmd]["price"]["amount"] = $amount;
                                              $this->getConfig()->set("commands", $cmds);
                                              $unit = $this->economy->getMonetaryUnit();
-                                             $sender->sendMessage(self::PREFIX . TF::GREEN . "The price of $amount $unit has successfully been set to the command $cmd!")
+                                             $sender->sendMessage(self::PREFIX . TF::GREEN . "The price of $amount $unit has successfully been set to the command $cmd!");
                                         }else{
                                              $sender->sendMessage(self::ERROR . "Command $cmd couldn't be found!");
                                         }
