@@ -23,6 +23,7 @@ class main extends PluginBase implements Listener{
      
      const PREFIX = TF::YELLOW . "[CommandShop]" . TF::WHITE . " ";
      const ERROR = TF::YELLOW . "[CommandShop]" . TF::RED . " [ERROR]" . TF::WHITE . " ";
+     public $signsetters;
 
      public function onEnable(){
           $this->getServer()->getPluginManager()->registerEvents($this,$this);
@@ -75,6 +76,7 @@ class main extends PluginBase implements Listener{
      public function buyCmd(string $cmd, Player $p): bool{
           if($p instanceof Player){
                $name = $p->getName();
+               $cmd = strtolower($cmd);
                $cmds = $this->getConfig()->get("commands", []);
                if(isset($cmds[$cmd])){
                     $cmda = $cmds[$cmd];
@@ -133,6 +135,7 @@ class main extends PluginBase implements Listener{
                               $cmds = $this->getConfig()->get("commands", []);
                               $cmds[$name]["cmd"] = $cmd;
                               $this->getConfig()->set("commands", $cmds);
+                              $this->getConfig()->save();
                               $sender->sendMessage(self::PREFIX . TF::GREEN . "Command $name has been successfully added to the list of buyable commands!");
                               $sender->sendMessage(self::PREFIX . TF::AQUA . "Infos:");
                               $sender->sendMessage(self::PREFIX . "Name: " . $name);
@@ -145,6 +148,7 @@ class main extends PluginBase implements Listener{
                               if(isset($cmds[$name])){
                                    unset($cmds[$name]);
                                    $this->getConfig()->set("commands", $cmds);
+                                   $this->getConfig()->save();
                                    $sender->sendMessage(self::PREFIX . TF::GREEN . "Command $name has been successfully removed from the list of buyable commands!");
                               }else{
                                    $sender->sendMessage(self::ERROR . "Couldn't find $name in the list of buyable commands!");
@@ -162,6 +166,7 @@ class main extends PluginBase implements Listener{
                                              $cmds[$cmd]["price"]["paytype"] = "money";
                                              $cmds[$cmd]["price"]["amount"] = $amount;
                                              $this->getConfig()->set("commands", $cmds);
+                                             $this->getConfig()->save();
                                              $unit = $this->economy->getMonetaryUnit();
                                              $sender->sendMessage(self::PREFIX . TF::GREEN . "The price of $amount $unit has successfully been set to the command $cmd!");
                                         }else{
@@ -177,6 +182,7 @@ class main extends PluginBase implements Listener{
                                         $cmds[$cmd]["price"]["paytype"] = "item";
                                         $cmds[$cmd]["price"]["item"] = $item;
                                         $this->getConfig()->set("commands", $cmds);
+                                        $this->getConfig()->save();
                                         $sender->sendMessage(self::PREFIX . TF::GREEN . "The item-price of $item has successfully been set to the command $cmd!");
                                    }else{
                                         $sender->sendMessage(self::ERROR . "Command $cmd couldn't be found!");
@@ -186,7 +192,9 @@ class main extends PluginBase implements Listener{
                               }
                     }
                case "buycmd":
-                    // do stuff, will code when i have time
+                    if(count($args) < 1) return false;
+                    $cmd = array_shift($args);
+                    $this->buyCmd($cmd, $sender);
           }
           return true;
      }
@@ -195,20 +203,35 @@ class main extends PluginBase implements Listener{
           if($event->getBlock()->getId() != Block::SIGN_POST && $event->getBlock()->getId() != Block::WALL_SIGN) return;
           $p = $event->getPlayer();
           $sign = $p->getLevel()->getTile($event->getBlock());
+          $level = $p->getLevel()->getName();
           if(!($sign instanceof Sign)) return;
           $x = $sign->getBlock()->getX();
           $y = $sign->getBlock()->getY();
           $z = $sign->getBlock()->getZ();
           $signs = $this->getConfig()->get("signs", []);
-          foreach($signs as $s){
-               if($s["x"] === $x && $s["y"] === $y && $s["z"] === $z){
-                    if($p->hasPermission("cshop.buy.sign")){
-                         $this->buyCmd($s["cmd"], $p);
-                    }else{
-                         $p->sendMessage(self::ERROR . "You don't have the permission to buy commands via signs!");
+          if(isset($this->signsetters[$p->getName()])){
+               $index = count($signs + 1);
+               $signs[$index]["x"] = $x;
+               $signs[$index]["y"] = $y;
+               $signs[$index]["z"] = $z;
+               $signs[$index]["level"] = $level;
+               $signs[$index]["cmd"] = $this->signsetters[$p->getName()];
+               $this->getConfig()->set($signs);
+               $this->getConfig()->save();
+               $p->sendMessage(self::PREFIX . TF::GREEN . "Sign has been successfully created!");
+               return;
+          }else{
+               foreach($signs as $s){
+                    if($s["x"] === $x && $s["y"] === $y && $s["z"] === $z && $s["level"] === $level){
+                         if($p->hasPermission("cshop.buy.sign")){
+                              $this->buyCmd($s["cmd"], $p);
+                         }else{
+                              $p->sendMessage(self::ERROR . "You don't have the permission to buy commands via signs!");
+                         }
+                         return;
                     }
-                    return;
                }
           }
+          return;
      }
 }
