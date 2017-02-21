@@ -1,5 +1,11 @@
 ---
-# Config and command-database for CommandShop by BoxOfDevs:
+# Config and command/sign-database for CommandShop by BoxOfDevs:
+
+# Messages:
+
+#   Coming in later update, stay tuned!
+
+# List and database of buyable commands:
 
 commands:
   example:
@@ -7,7 +13,9 @@ commands:
     price:
       paytype: "item"
       item: "1:0:64"
-    
+
+# List and database for CommandShop signs:
+
 signs:
 
 ...
