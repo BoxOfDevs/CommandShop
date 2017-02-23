@@ -7,7 +7,7 @@ main: BoxOfDevs\CommandShop\main
 commands: 
   cshop:
     description: "Create, manage and remove 'buyable' commands"
-    usage: "/cshop <add|remove|setprice|sign|help> <args>"
+    usage: "/cshop <add|remove|setprice|sign|list|info|help> <args>"
     permission: cshop.command.manage
   buycmd:
     description: "'Buy' a command"
