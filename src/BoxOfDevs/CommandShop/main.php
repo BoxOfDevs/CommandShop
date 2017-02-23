@@ -40,6 +40,18 @@ class main extends PluginBase implements Listener{
                $this->getLogger()->warning("Failed to load EconomyAPI! Only item-pay mode is avaiable.");
           }
      }
+
+     public function getMessage(string $msg, array $replacers = []): string{
+          $msg = $this->getConfig()->get($msg);
+          $msg = str_ireplace(array_keys($replacers), array_values($replacers), $msg);
+          $values = [
+               "{prefix}" => self::PREFIX,
+               "{error}" => self::ERROR,
+               "{line}" => "\n"
+          ];
+          $msg = str_ireplace(array_keys($values), array_values($values), $msg);
+          return $msg;
+     }
      
      public function getItem(string $name): Item{
           if(strpos($name, ":") != false){
@@ -65,14 +77,16 @@ class main extends PluginBase implements Listener{
           return $item;
      }
 
-     public function executeCommand(string $cmd, Player $p){
-          $cmd = str_replace("{player}", $p->getName(), $cmd);
-          $cmd = str_replace("{level}", $p->getLevel()->getName(), $cmd);
-          $cmd = str_replace("{x}", round($p->x, 0), $cmd);
-          $cmd = str_replace("{y}", round($p->x, 0), $cmd);
-          $cmd = str_replace("{z}", round($p->x, 0), $cmd);
-          $this->getServer()->dispatchCommand(new ConsoleCommandSender(), $cmd);
-          return true;
+     public function executeCommands(array $cmds, Player $p){
+          $cmds = str_replace("{player}", $p->getName(), $cmds);
+          $cmds = str_replace("{level}", $p->getLevel()->getName(), $cmds);
+          $cmds = str_replace("{x}", round($p->x, 0), $cmds);
+          $cmds = str_replace("{y}", round($p->x, 0), $cmds);
+          $cmds = str_replace("{z}", round($p->x, 0), $cmds);
+          foreach ($cmds as $cmd) {
+               $this->getServer()->dispatchCommand(new ConsoleCommandSender(), $cmd);
+          }
+          return;
      }
 
      public function buyCmd(string $cmd, Player $p): bool{
@@ -82,42 +96,42 @@ class main extends PluginBase implements Listener{
                $cmds = $this->getConfig()->get("commands", []);
                if(isset($cmds[$cmd])){
                     $cmda = $cmds[$cmd];
-                    $command = $cmda["cmd"];
+                    $commands = $cmda["cmds"];
                     $price = $cmda["price"];
                     if($price["paytype"] === "economyapi"){
                          if($this->economy != null){
                               $amount = $price["amount"];
                               if($this->economy->reduceMoney($p, $amount) === 1){
-                                   $this->executeCommand($command, $p);
-                                   $unit = $this->economy->getMonetaryUnit();
-                                   $p->sendMessage(self::PREFIX . TF::GREEN . "You successfully bought the command $cmd for $amount $unit!");
-                                   $p->sendMessage(self::PREFIX . "The command has already been executed.");
+                                   $this->executeCommands($commands, $p);
+                                   $replacers = ["{cmd}" => $cmd, "{amount}" => $amount, "{unit}" => $this->economy->getMonetaryUnit()];
+                                   $p->sendMessage($this->getMessage("buy.money.success", $replacers));
                                    $this->getLogger()->debug("The player $name has bought the command $cmd for $amount $unit via EconomyAPI.");
                                    return true;
                               }else{
-                                   $p->sendMessage(self::ERROR . "You don't have enough money to buy this command. You would need $amount $unit!");
+                                   $replacers = ["{amount}" => $amount, "{unit}" => $this->economy->getMonetaryUnit()];
+                                   $p->sendMessage($this->getMessage("buy.money.miss", $replacers));
                               }
                          }else{
                               $msg = self::ERROR . "Command couldn't be bought because EconomyAPI isn't loaded.";
                               $this->getLogger()->warning($msg);
-                              $p->sendMessage($msg . "If you are a normal user, please contact your server administrator!");
+                              $p->sendMessage($msg . $this->getMessage("buy.contactadmin"));
                          }
                     }elseif($price["paytype"] === "item"){
                          $item = $price["item"];
                          if(!$p->getInventory()->contains(getItem($item))){
-                              $p->sendMessage(self::ERROR . "You don't have enough items to buy this command, items needed:");
-                              $p->sendMessage("Item:" . $item->getName() . "Amount:" . $item->getCount());
+                              $replacers = ["{item}" => $item->getName(), "{amount}" => $item->getCount()];
+                              $p->sendMessage($this->getMessage("buy.item.miss", $replacers));
                          }else{
                               $p->getInventory()->remove($item);
-                              $this->executeCommand($command, $p);
-                              $p->sendMessage(self::PREFIX . TF::GREEN . "You successfully bought the command $cmd with the item $item!");
-                              $p->sendMessage(self::PREFIX . "The command has already been executed.");
+                              $this->executeCommands($commands, $p);
+                              $replacers = ["{cmd}" => $cmd, "{item}" => $item->getName()];
+                              $p->sendMessage($this->getMessage("buy.item.success", $replacers));
                               $this->getLogger()->debug("The player $name has bought the command $cmd with the item $item.");
                               return true;
                          }
                     }
                }else{
-                    $p->sendMessage(self::ERROR . "Command $cmd wasn't found in the list of buyable commands. If you are a normal player, please contact your server administrator!");
+                    $p->sendMessage(self::ERROR . "Command $cmd wasn't found in the list of buyable commands." . $this->getMessage("buy.contactadmin"));
                }
           }else{
                $this->getLogger()->warning(self::ERROR . "The following error happened while trying to execute the function buyCmd(): The variable \$p wasn't a Player Object. If you think you didn't cause this problem, please open an issue on the GitHub repository: https://github.com/BoxOfDevs/CommandShop");
@@ -135,14 +149,18 @@ class main extends PluginBase implements Listener{
                               $name = strtolower(array_shift($args));
                               $cmd = strtolower(implode(" ", $args));
                               $cmds = $this->getConfig()->get("commands", []);
-                              $cmds[$name]["cmd"] = $cmd;
-                              $this->getConfig()->set("commands", $cmds);
-                              $this->getConfig()->save();
-                              $sender->sendMessage(self::PREFIX . TF::GREEN . "Command $name has been successfully added to the list of buyable commands!");
-                              $sender->sendMessage(self::PREFIX . TF::AQUA . "Infos:");
-                              $sender->sendMessage(self::PREFIX . "Name: " . $name);
-                              $sender->sendMessage(self::PREFIX . "Command: " . $cmd);
-                              $sender->sendMessage(self::PREFIX . "Please set a price now using " . TF::AQUA . "/cshop setprice" . TF::WHITE . ".");
+                              if(!isset($cmds[$name])){
+                                   $cmds[$name]["cmds"] = [$cmd];
+                                   $this->getConfig()->set("commands", $cmds);
+                                   $this->getConfig()->save();
+                                   $sender->sendMessage(self::PREFIX . TF::GREEN . "Command $name has been successfully added to the list of buyable commands!");
+                                   $sender->sendMessage(self::PREFIX . TF::AQUA . "Infos:");
+                                   $sender->sendMessage(self::PREFIX . "Name: " . $name);
+                                   $sender->sendMessage(self::PREFIX . "Command: " . $cmd);
+                                   $sender->sendMessage(self::PREFIX . "Please set a price now using " . TF::AQUA . "/cshop setprice" . TF::WHITE . ". Or add more commands to be executed using " . TF::AQUA . "/cshop addcmd" . TF::WHITE . ".");
+                              }else{
+                                   $sender->sendMessage(self::ERROR . "That command does already exist!");
+                              }
                          case "remove":
                               if(count($args) < 1) return false;
                               $name = strtolower(array_shift($args));
@@ -192,10 +210,60 @@ class main extends PluginBase implements Listener{
                               }else{
                                    return false;
                               }
+                         case "sign":
+                              if(count($args) < 1) return false;
+                              $cmd = strtolower(array_shift($args));
+                              $cmds = $this->getConfig()->get("commands", []);
+                              if(isset($cmds[$cmd])){
+                                   $this->signsetters[$sender->getName()] = $cmd;
+                                   $sender->sendMessage(self::PREFIX . "Please tap a sign now!");
+                              }else{
+                                   $sender->sendMessage(self::ERROR . "Command $cmd couldn't be found!");
+                              }
+                         case "list":
+                              $cmds = $this->getConfig()->get("commands", []);
+                              if($cmds != []){
+                                   $msg = implode(", ", array_keys($cmds));
+                                   $sender->sendMessage(self::PREFIX . "List of all buyable commands:");
+                                   $sender->sendMessage($msg);
+                              }else{
+                                   $sender->sendMessage(self::ERROR . "You haven't created any buyable commands yet, please create one using " . TF::AQUA . "/cshop add" . TF::WHITE . ".");
+                              }
+                         case "info":
+                              if(count($args) < 1) return false;
+                              $cmd = strtolower(array_shift($args));
+                              $cmds = $this->getConfig()->get("commands", []);
+                              if(isset($cmds[$cmd])){
+                                   $cmd = $cmds[$cmd];
+                                   $sender->sendMessage(self::PREFIX . "Information for the command $cmd:");
+                                   $commands = "Commands: \n" . implode("\n", $cmd["cmds"]);
+                                   $sender->sendMessage($commands);
+                                   if(isset($cmd["price"])){
+                                        $paytype = $cmd["price"]["paytype"];
+                                        if($paytype === "money"){
+                                             $amount = $cmd["price"]["amount"];
+                                             $sender->sendMessage("Paytype: Money (EconomyAPI)");
+                                             $sender->sendMessage("Amount: $amount");
+                                        }elseif($paytype === "item"){
+                                             $item = $cmd["price"]["item"];
+                                             $item = $this->getItem($item);
+                                             $sender->sendMessage("Paytype: Items");
+                                             $sender->sendMessage("Item: " . $item->getName() . "Damage: " . $item->getDamage() . "Amount: " . $item->getCount());
+                                        }else{
+                                             $sender->sendMessage(self::ERROR, "Invalid paytype, please use " . TF::AQUA . "/cshop setprice" . TF::WHITE . " to set the price for this command!");
+                                        }
+                                   }else{
+                                        $sender->sendMessage(self::ERROR, "No price has been set for this command, please use " . TF::AQUA . "/cshop setprice" . TF::WHITE . " to set the price for this command!");
+                                   }
+                              }else{
+                                   $sender->sendMessage(self::ERROR . "Command $cmd has not been found!");
+                              }
+                         case "help":
+                              $sender->sendMessage("Please visit https://github.com/BoxOfDevs/CommandShop");
                     }
                case "buycmd":
                     if(count($args) < 1) return false;
-                    $cmd = array_shift($args);
+                    $cmd = strtolower(array_shift($args));
                     $this->buyCmd($cmd, $sender);
           }
           return true;
@@ -228,7 +296,7 @@ class main extends PluginBase implements Listener{
                          if($p->hasPermission("cshop.buy.sign")){
                               $this->buyCmd($s["cmd"], $p);
                          }else{
-                              $p->sendMessage(self::ERROR . "You don't have the permission to buy commands via signs!");
+                              $p->sendMessage($this->getMessage("sign.noperm"));
                          }
                          return;
                     }
