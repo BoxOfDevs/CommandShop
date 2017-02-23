@@ -3,13 +3,22 @@
 
 # Messages:
 
-#   Coming in later update, stay tuned!
+buy.money.success: "{prefix}You successfully bought the command {cmd} for {amount} {unit}!{line}{prefix}The command has already been executed."
+buy.money.miss: "{error}You don't have enough money to buy this command. You would need {amount} {unit}!"
+
+buy.item.success: "{prefix}You successfully bought the command {cmd} with the item {item}!{line}{prefix}The command has already been executed."
+buy.item.miss: "{error}You don't have enough items to buy this command, items needed:{line}Item: {item} Amount: {amount}"
+
+buy.contactadmin: "{line}If you are a normal user, please contact your server administrator!"
+
+sign.noperm: "{error}You don't have the permission to buy commands via signs!"
 
 # List and database of buyable commands:
 
 commands:
   example:
-    cmd: "tp {player} 123 123 123"
+    cmds: 
+     - "tp {player} 123 123 123"
     price:
       paytype: "item"
       item: "1:0:64"
