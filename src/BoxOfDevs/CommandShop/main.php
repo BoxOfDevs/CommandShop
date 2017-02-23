@@ -1,5 +1,7 @@
 <?php
+
 namespace BoxOfDevs\CommandShop;
+
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
 use pocketmine\command\Command;
