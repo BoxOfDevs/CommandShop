@@ -7,7 +7,7 @@ main: BoxOfDevs\CommandShop\main
 commands: 
   cshop:
     description: "Create, manage and remove 'buyable' commands"
-    usage: "/cshop <add|remove|setprice|help> <command>"
+    usage: "/cshop <add|remove|setprice|sign|help> <args>"
     permission: cshop.command.manage
   buycmd:
     description: "'Buy' a command"
@@ -19,11 +19,11 @@ permissions:
     description: "Permission for '/cshop add' and '/cshop remove'"
   cshop.buy:
     default: op
-    description: "Permission for 'buying' commands via /buycmd AND via signs"
+    description: "Permission for 'buying' commands via '/buycmd' AND via signs"
     children:
       cshop.buy.command:
         default: true
-        description: "Permission for 'buying' commands via /buycmd"
+        description: "Permission for 'buying' commands via '/buycmd'"
       cshop.buy.sign:
         default: true
         description: "Permission for 'buying' commands via signs"
