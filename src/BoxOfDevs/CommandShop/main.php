@@ -260,6 +260,8 @@ class main extends PluginBase implements Listener{
                               }
                          case "help":
                               $sender->sendMessage("Please visit https://github.com/BoxOfDevs/CommandShop");
+                         default:
+                              return false;
                     }
                case "buycmd":
                     if(count($args) < 1) return false;
