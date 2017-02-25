@@ -11,7 +11,11 @@ buy.item.miss: "{error}You don't have enough items to buy this command, items ne
 
 buy.contactadmin: "{line}If you are a normal user, please contact your server administrator!"
 
+command.notfound: "{error}Command {cmd} wasn't found in the list of buyable commands!"
+
 sign.noperm: "{error}You don't have the permission to buy commands via signs!"
+
+buycmd.disabled: "{error}/buycmd is disabled for this buyable command!"
 
 # List and database of buyable commands:
 
@@ -22,6 +26,7 @@ commands:
     price:
       paytype: "item"
       item: "1:0:64"
+    buycmd: true
 
 # List and database for CommandShop signs:
 
