@@ -259,7 +259,7 @@ class main extends PluginBase implements Listener{
                                    $sender->sendMessage(self::ERROR . "Command $cmd has not been found!");
                               }
                          case "help":
-                              $sender->sendMessage("Please visit https://github.com/BoxOfDevs/CommandShop");
+                              $sender->sendMessage("Please visit the wiki for this plugin here: https://github.com/BoxOfDevs/CommandShop/wiki");
                          default:
                               return false;
                     }
