@@ -131,7 +131,8 @@ class main extends PluginBase implements Listener{
                          }
                     }
                }else{
-                    $p->sendMessage(self::ERROR . "Command $cmd wasn't found in the list of buyable commands." . $this->getMessage("buy.contactadmin"));
+                    $replacers = ["{cmd}" => $cmd];
+                    $p->sendMessage($this->getMessage("command.notfound", $replacers) . $this->getMessage("buy.contactadmin"));
                }
           }else{
                $this->getLogger()->warning(self::ERROR . "The following error happened while trying to execute the function buyCmd(): The variable \$p wasn't a Player Object. If you think you didn't cause this problem, please open an issue on the GitHub repository: https://github.com/BoxOfDevs/CommandShop");
@@ -151,6 +152,7 @@ class main extends PluginBase implements Listener{
                               $cmds = $this->getConfig()->get("commands", []);
                               if(!isset($cmds[$name])){
                                    $cmds[$name]["cmds"] = [$cmd];
+                                   $cmds[$name]["buycmd"] = true;
                                    $this->getConfig()->set("commands", $cmds);
                                    $this->getConfig()->save();
                                    $sender->sendMessage(self::PREFIX . TF::GREEN . "Command $name has been successfully added to the list of buyable commands!");
@@ -171,7 +173,8 @@ class main extends PluginBase implements Listener{
                                    $this->getConfig()->save();
                                    $sender->sendMessage(self::PREFIX . TF::GREEN . "Command $name has been successfully removed from the list of buyable commands!");
                               }else{
-                                   $sender->sendMessage(self::ERROR . "Couldn't find $name in the list of buyable commands!");
+                                   $replacers = ["{cmd}" => $name];
+                                   $sender->sendMessage($this->getMessage("command.notfound", $replacers));
                               }
                          case "setprice":
                               if(count($args) < 3) return false;
@@ -190,7 +193,8 @@ class main extends PluginBase implements Listener{
                                              $unit = $this->economy->getMonetaryUnit();
                                              $sender->sendMessage(self::PREFIX . TF::GREEN . "The price of $amount $unit has successfully been set to the command $cmd!");
                                         }else{
-                                             $sender->sendMessage(self::ERROR . "Command $cmd couldn't be found!");
+                                             $replacers = ["{cmd}" => $cmd];
+                                             $sender->sendMessage($this->getMessage("command.notfound", $replacers));
                                         }
                                    }else{
                                         $sender->sendMessage(self::ERROR . "Please install EconomyAPI by onebone in order to be able to pay for commands with money!");
@@ -205,7 +209,8 @@ class main extends PluginBase implements Listener{
                                         $this->getConfig()->save();
                                         $sender->sendMessage(self::PREFIX . TF::GREEN . "The item-price of $item has successfully been set to the command $cmd!");
                                    }else{
-                                        $sender->sendMessage(self::ERROR . "Command $cmd couldn't be found!");
+                                        $replacers = ["{cmd}" => $cmd];
+                                        $sender->sendMessage($this->getMessage("command.notfound", $replacers));
                                    }
                               }else{
                                    return false;
@@ -218,7 +223,31 @@ class main extends PluginBase implements Listener{
                                    $this->signsetters[$sender->getName()] = $cmd;
                                    $sender->sendMessage(self::PREFIX . "Please tap a sign now!");
                               }else{
-                                   $sender->sendMessage(self::ERROR . "Command $cmd couldn't be found!");
+                                   $replacers = ["{cmd}" => $cmd];
+                                   $sender->sendMessage($this->getMessage("command.notfound", $replacers));
+                              }
+                         case "buycmd":
+                              if(count($args) < 2) return false;
+                              $cmds = $this->getConfig()->get("commands", []);
+                              $cmd = strtolower(array_shift($args));
+                              $bool = strtolower(array_shift($args));
+                              if(isset($cmds[$cmd])){
+                                   if($bool === "true"){
+                                        $cmds[$cmd]["buycmd"] = true;
+                                        $this->getConfig()->get("commands", $cmds);
+                                        $this->getConfig()->save();
+                                        $sender->sendMessage(self::PREFIX . "/buycmd has been successfully enabled for $cmd");
+                                   }elseif($bool === "false"){
+                                        $cmds[$cmd]["buycmd"] = false;
+                                        $this->getConfig()->get("commands", $cmds);
+                                        $this->getConfig()->save();
+                                        $sender->sendMessage(self::PREFIX . "/buycmd has been successfully disabled for $cmd");
+                                   }else{
+                                        return false;
+                                   }
+                              }else{
+                                   $replacers = ["{cmd}" => $cmd];
+                                   $sender->sendMessage($this->getMessage("command.notfound", $replacers));
                               }
                          case "list":
                               $cmds = $this->getConfig()->get("commands", []);
@@ -256,7 +285,8 @@ class main extends PluginBase implements Listener{
                                         $sender->sendMessage(self::ERROR, "No price has been set for this command, please use " . TF::AQUA . "/cshop setprice" . TF::WHITE . " to set the price for this command!");
                                    }
                               }else{
-                                   $sender->sendMessage(self::ERROR . "Command $cmd has not been found!");
+                                   $replacers = ["{cmd}" => $cmd];
+                                   $sender->sendMessage($this->getMessage("command.notfound", $replacers));
                               }
                          case "help":
                               $sender->sendMessage("Please visit the wiki for this plugin here: https://github.com/BoxOfDevs/CommandShop/wiki");
@@ -266,7 +296,18 @@ class main extends PluginBase implements Listener{
                case "buycmd":
                     if(count($args) < 1) return false;
                     $cmd = strtolower(array_shift($args));
-                    $this->buyCmd($cmd, $sender);
+                    $cmds = $this->getConfig()->get("commands", []);
+                    if(isset($cmds[$cmd])){
+                         if($cmds[$cmd] === true){
+                              $this->buyCmd($cmd, $sender);
+                         }else{
+                              $replacers = ["{cmd}" => $cmd];
+                              $sender->sendMessage($this->getMessage("buycmd.disabled", $replacers));
+                         }
+                    }else{
+                         $replacers = ["{cmd}" => $cmd];
+                         $sender->sendMessage($this->getMessage("command.notfound", $replacers));
+                    }
           }
           return true;
      }
@@ -288,7 +329,7 @@ class main extends PluginBase implements Listener{
                $signs[$index]["z"] = $z;
                $signs[$index]["level"] = $level;
                $signs[$index]["cmd"] = $this->signsetters[$p->getName()];
-               $this->getConfig()->set($signs);
+               $this->getConfig()->set("signs", $signs);
                $this->getConfig()->save();
                $p->sendMessage(self::PREFIX . TF::GREEN . "Sign has been successfully created!");
                return;
