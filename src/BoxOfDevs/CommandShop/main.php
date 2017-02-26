@@ -27,6 +27,10 @@ class main extends PluginBase implements Listener{
      const ERROR = TF::YELLOW . "[CommandShop]" . TF::RED . " [ERROR]" . TF::WHITE . " ";
      public $signsetters;
 
+
+     /*
+     When the plugin enables
+     */
      public function onEnable(){
           $this->getServer()->getPluginManager()->registerEvents($this,$this);
           $this->getLogger()->info("CommandShop by BoxOfDevs enabled!");
@@ -41,6 +45,13 @@ class main extends PluginBase implements Listener{
           }
      }
 
+
+     /*
+     Translate a message from the config
+     @param     $msg    string
+     @param     $replacers    array
+     @return string
+     */
      public function getMessage(string $msg, array $replacers = []): string{
           $msg = $this->getConfig()->get($msg);
           $msg = str_ireplace(array_keys($replacers), array_values($replacers), $msg);
@@ -53,6 +64,12 @@ class main extends PluginBase implements Listener{
           return $msg;
      }
      
+
+     /*
+     Get an item from a string (used to parse count)
+     @param     $name    string
+     @return \pocketmine\item\Item
+     */
      public function getItem(string $name): Item{
           if(strpos($name, ":") != false){
                $arr = explode(":", $name);
@@ -77,6 +94,12 @@ class main extends PluginBase implements Listener{
           return $item;
      }
 
+     /*
+     Execute command as console
+     @param     $cmds    array
+     @param     $p    Player
+     @return void
+     */
      public function executeCommands(array $cmds, Player $p){
           $cmds = str_replace("{player}", $p->getName(), $cmds);
           $cmds = str_replace("{level}", $p->getLevel()->getName(), $cmds);
@@ -89,6 +112,40 @@ class main extends PluginBase implements Listener{
           return;
      }
 
+     /*
+     Removes an item from a player's invenotry (solving count issues with soft)
+     @param     $item    Item
+     @param     $inventory    \pocketmine\inventory\BaseInventory
+     @return void
+     */
+     public function remove(Item $item, \pocketmine\inventory\BaseInventory $inventory){
+		$checkDamage = !$item->hasAnyDamageValue();
+		$checkTags = $item->hasCompoundTag();
+		$checkCount = $item->getCount() === null ? false : true;
+		$count = $item->getCount();
+
+		foreach($this->getContents() as $index => $i){
+			if($item->equals($i, $checkDamage, $checkTags)){
+				if($checkCount && $i->getCount() > $item->getCount()) {
+					$i->setCount($i->getCount() - $count);
+					$this->setItem($index, $i);
+					return;
+				} elseif($checkCount && $i->getCount() < $item->getCount()) {
+					$count -= $i->getCount();
+					$this->clear($index);
+				} else {
+					$this->clear($index);
+				}
+			}
+		}
+	}
+
+     /*
+     Buy a command
+     @param     $cmd    string
+     @param     $p    Player
+     @return bool
+     */
      public function buyCmd(string $cmd, Player $p): bool{
           if($p instanceof Player){
                $name = $p->getName();
@@ -122,7 +179,7 @@ class main extends PluginBase implements Listener{
                               $replacers = ["{item}" => $item->getName(), "{amount}" => $item->getCount()];
                               $p->sendMessage($this->getMessage("buy.item.miss", $replacers));
                          }else{
-                              $p->getInventory()->remove($item);
+                              $this->remove($item, $p->getInventory());
                               $this->executeCommands($commands, $p);
                               $replacers = ["{cmd}" => $cmd, "{item}" => $item->getName()];
                               $p->sendMessage($this->getMessage("buy.item.success", $replacers));
@@ -140,6 +197,14 @@ class main extends PluginBase implements Listener{
           return false;
      }
 
+     /*
+     Called when one of the defined commands of the plugin has been called
+     @param     $sender     \pocketmine\command\CommandSender
+     @param     $command          \pocketmine\command\Command
+     @param     $label         mixed
+     @param     $args          array
+     return bool
+     */
      public function onCommand(CommandSender $sender, Command $command, $label, array $args){
           switch($command->getName()){
                case "cshop":
@@ -331,6 +396,12 @@ class main extends PluginBase implements Listener{
           return true;
      }
 
+
+     /*
+     When a player touches a sign
+     @param     $event    \pocketmine\event\player\PlayerInteractEvent
+     @return bool
+     */
      public function onSignTouch(PlayerInteractEvent $event){
           if($event->getBlock()->getId() != Block::SIGN_POST && $event->getBlock()->getId() != Block::WALL_SIGN) return;
           $p = $event->getPlayer();
