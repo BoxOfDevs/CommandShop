@@ -353,7 +353,7 @@ class main extends PluginBase implements Listener{
                                              $item = $cmd["price"]["item"];
                                              $item = $this->getItem($item);
                                              $sender->sendMessage("Paytype: Items");
-                                             $sender->sendMessage("Item: " . $item->getName() . "Damage: " . $item->getDamage() . "Amount: " . $item->getCount());
+                                             $sender->sendMessage("Item: " . $item->getName() . " Damage: " . $item->getDamage() . " Amount: " . $item->getCount());
                                         }else{
                                              $sender->sendMessage(self::ERROR, "Invalid paytype, please use " . TF::AQUA . "/cshop setprice" . TF::WHITE . " to set the price for this command!");
                                         }
