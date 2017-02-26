@@ -267,13 +267,14 @@ class main extends PluginBase implements Listener{
                               break;
                          case "info":
                               if(count($args) < 1) return false;
-                              $cmd = strtolower(array_shift($args));
+                              $cmdn = strtolower(array_shift($args));
                               $cmds = $this->getConfig()->get("commands", []);
                               if(isset($cmds[$cmd])){
-                                   $cmd = $cmds[$cmd];
-                                   $sender->sendMessage(self::PREFIX . "Information for the command $cmd:");
+                                   $cmd = $cmds[$cmdn];
+                                   $sender->sendMessage(self::PREFIX . "Information for the command $cmdn:");
                                    $commands = "Commands: \n" . implode("\n", $cmd["cmds"]);
                                    $sender->sendMessage($commands);
+                                   $sender->sendMessage("/buycmd: " . $cmd["buycmd"]);
                                    if(isset($cmd["price"])){
                                         $paytype = $cmd["price"]["paytype"];
                                         if($paytype === "money"){
@@ -304,12 +305,12 @@ class main extends PluginBase implements Listener{
                     }
                     break;
                case "buycmd":
-                    if(!sender instanceof Player) $sender->sendMessage(self::ERROR . "Please use this command in-game!");
+                    if(!$sender instanceof Player) $sender->sendMessage(self::ERROR . "Please use this command in-game!");
                     if(count($args) < 1) return false;
                     $cmd = strtolower(array_shift($args));
                     $cmds = $this->getConfig()->get("commands", []);
                     if(isset($cmds[$cmd])){
-                         if($cmds[$cmd] === true){
+                         if($cmds[$cmd]["buycmd"] === true){
                               $this->buyCmd($cmd, $sender);
                          }else{
                               $replacers = ["{cmd}" => $cmd];
