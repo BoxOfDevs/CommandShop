@@ -152,7 +152,7 @@ class main extends PluginBase implements Listener{
                               $cmds = $this->getConfig()->get("commands", []);
                               if(!isset($cmds[$name])){
                                    $cmds[$name]["cmds"] = [$cmd];
-                                   $cmds[$name]["buycmd"] = true;
+                                   $cmds[$name]["buycmd"] = "true";
                                    $this->getConfig()->set("commands", $cmds);
                                    $this->getConfig()->save();
                                    $sender->sendMessage(self::PREFIX . TF::GREEN . "Command $name has been successfully added to the list of buyable commands!");
@@ -238,12 +238,12 @@ class main extends PluginBase implements Listener{
                               $bool = strtolower(array_shift($args));
                               if(isset($cmds[$cmd])){
                                    if($bool === "true"){
-                                        $cmds[$cmd]["buycmd"] = true;
+                                        $cmds[$cmd]["buycmd"] = "true";
                                         $this->getConfig()->get("commands", $cmds);
                                         $this->getConfig()->save();
                                         $sender->sendMessage(self::PREFIX . "/buycmd has been successfully enabled for $cmd");
                                    }elseif($bool === "false"){
-                                        $cmds[$cmd]["buycmd"] = false;
+                                        $cmds[$cmd]["buycmd"] = "false";
                                         $this->getConfig()->get("commands", $cmds);
                                         $this->getConfig()->save();
                                         $sender->sendMessage(self::PREFIX . "/buycmd has been successfully disabled for $cmd");
@@ -269,7 +269,7 @@ class main extends PluginBase implements Listener{
                               if(count($args) < 1) return false;
                               $cmdn = strtolower(array_shift($args));
                               $cmds = $this->getConfig()->get("commands", []);
-                              if(isset($cmds[$cmd])){
+                              if(isset($cmds[$cmdn])){
                                    $cmd = $cmds[$cmdn];
                                    $sender->sendMessage(self::PREFIX . "Information for the command $cmdn:");
                                    $commands = "Commands: \n" . implode("\n", $cmd["cmds"]);
@@ -293,7 +293,7 @@ class main extends PluginBase implements Listener{
                                         $sender->sendMessage(self::ERROR, "No price has been set for this command, please use " . TF::AQUA . "/cshop setprice" . TF::WHITE . " to set the price for this command!");
                                    }
                               }else{
-                                   $replacers = ["{cmd}" => $cmd];
+                                   $replacers = ["{cmd}" => $cmdn];
                                    $sender->sendMessage($this->getMessage("command.notfound", $replacers));
                               }
                               break;
@@ -310,7 +310,7 @@ class main extends PluginBase implements Listener{
                     $cmd = strtolower(array_shift($args));
                     $cmds = $this->getConfig()->get("commands", []);
                     if(isset($cmds[$cmd])){
-                         if($cmds[$cmd]["buycmd"] === true){
+                         if($cmds[$cmd]["buycmd"] === "true"){
                               $this->buyCmd($cmd, $sender);
                          }else{
                               $replacers = ["{cmd}" => $cmd];
