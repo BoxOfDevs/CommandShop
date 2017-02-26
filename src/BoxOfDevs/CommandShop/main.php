@@ -343,7 +343,7 @@ class main extends PluginBase implements Listener{
                $signs[$index]["cmd"] = $this->signsetters[$p->getName()];
                $this->getConfig()->set("signs", $signs);
                $this->getConfig()->save();
-               unset($this->signsetters[$p->getName()];
+               unset($this->signsetters[$p->getName()]);
                $p->sendMessage(self::PREFIX . TF::GREEN . "Sign has been successfully created!");
                return;
           }else{
