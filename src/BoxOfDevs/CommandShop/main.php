@@ -13,7 +13,7 @@ use pocketmine\Server;
 use pocketmine\permission\Permission;
 use pocketmine\Player;
 use pocketmine\Inventoy;
-use pocketmine\Item;
+use pocketmine\item\Item;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\block\Block;
 use pocketmine\tile\Sign;
@@ -57,9 +57,9 @@ class main extends PluginBase implements Listener{
           if(strpos($name, ":") != false){
                $arr = explode(":", $name);
                $name = $arr[0];
-               $dmg = (integer) $arr[1];
+               $dmg = (int) $arr[1];
                if(isset($arr[2])){
-                    $count = (integer) $arr[2];
+                    $count = (int) $arr[2];
                }else{
                     $count = 1;
                }
@@ -117,8 +117,8 @@ class main extends PluginBase implements Listener{
                               $p->sendMessage($msg . $this->getMessage("buy.contactadmin"));
                          }
                     }elseif($price["paytype"] === "item"){
-                         $item = $price["item"];
-                         if(!$p->getInventory()->contains(getItem($item))){
+                         $item = $this->getItem($price["item"]);
+                         if(!$p->getInventory()->contains($item)){
                               $replacers = ["{item}" => $item->getName(), "{amount}" => $item->getCount()];
                               $p->sendMessage($this->getMessage("buy.item.miss", $replacers));
                          }else{
