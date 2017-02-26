@@ -219,7 +219,10 @@ class main extends PluginBase implements Listener{
                               }
                               break;
                          case "sign":
-                              if(!$sender instanceof Player) $sender->sendMessage(self::ERROR . "Please use this command in-game!");
+                              if(!$sender instanceof Player){
+                                   $sender->sendMessage(self::ERROR . "Please use this command in-game!");
+                                   break;
+                              }
                               if(count($args) < 1) return false;
                               $cmd = strtolower(array_shift($args));
                               $cmds = $this->getConfig()->get("commands", []);
@@ -305,7 +308,10 @@ class main extends PluginBase implements Listener{
                     }
                     break;
                case "buycmd":
-                    if(!$sender instanceof Player) $sender->sendMessage(self::ERROR . "Please use this command in-game!");
+                    if(!$sender instanceof Player){
+                         $sender->sendMessage(self::ERROR . "Please use this command in-game!");
+                         break;
+                    }
                     if(count($args) < 1) return false;
                     $cmd = strtolower(array_shift($args));
                     $cmds = $this->getConfig()->get("commands", []);
