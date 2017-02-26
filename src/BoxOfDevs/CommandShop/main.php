@@ -128,13 +128,13 @@ class main extends PluginBase implements Listener{
 			if($item->equals($i, $checkDamage, $checkTags)){
 				if($checkCount && $i->getCount() > $item->getCount()) {
 					$i->setCount($i->getCount() - $count);
-					$this->setItem($index, $i);
+					$inventory->setItem($index, $i);
 					return;
 				} elseif($checkCount && $i->getCount() < $item->getCount()) {
 					$count -= $i->getCount();
-					$this->clear($index);
+					$inventory->clear($index);
 				} else {
-					$this->clear($index);
+					$inventory->clear($index);
 				}
 			}
 		}
@@ -160,7 +160,8 @@ class main extends PluginBase implements Listener{
                               $amount = $price["amount"];
                               if($this->economy->reduceMoney($p, $amount) === 1){
                                    $this->executeCommands($commands, $p);
-                                   $replacers = ["{cmd}" => $cmd, "{amount}" => $amount, "{unit}" => $this->economy->getMonetaryUnit()];
+                                   $unit =  $this->economy->getMonetaryUnit();
+                                   $replacers = ["{cmd}" => $cmd, "{amount}" => $amount, "{unit}" => $unit];
                                    $p->sendMessage($this->getMessage("buy.money.success", $replacers));
                                    $this->getLogger()->debug("The player $name has bought the command $cmd for $amount $unit via EconomyAPI.");
                                    return true;
