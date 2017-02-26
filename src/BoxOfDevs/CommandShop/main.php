@@ -124,7 +124,7 @@ class main extends PluginBase implements Listener{
 		$checkCount = $item->getCount() === null ? false : true;
 		$count = $item->getCount();
 
-		foreach($this->getContents() as $index => $i){
+		foreach($inventory->getContents() as $index => $i){
 			if($item->equals($i, $checkDamage, $checkTags)){
 				if($checkCount && $i->getCount() > $item->getCount()) {
 					$i->setCount($i->getCount() - $count);
@@ -155,7 +155,7 @@ class main extends PluginBase implements Listener{
                     $cmda = $cmds[$cmd];
                     $commands = $cmda["cmds"];
                     $price = $cmda["price"];
-                    if($price["paytype"] === "economyapi"){
+                    if($price["paytype"] === "money"){
                          if($this->economy != null){
                               $amount = $price["amount"];
                               if($this->economy->reduceMoney($p, $amount) === 1){
@@ -414,9 +414,9 @@ class main extends PluginBase implements Listener{
           $signs = $this->getConfig()->get("signs", []);
           if(isset($this->signsetters[$p->getName()])){
                $index = count($signs) + 1;
-               $signs[$index]["x"] = $x;
-               $signs[$index]["y"] = $y;
-               $signs[$index]["z"] = $z;
+               $signs[$index]["posx"] = $x;
+               $signs[$index]["posy"] = $y;
+               $signs[$index]["posz"] = $z;
                $signs[$index]["level"] = $level;
                $signs[$index]["cmd"] = $this->signsetters[$p->getName()];
                $this->getConfig()->set("signs", $signs);
@@ -426,7 +426,7 @@ class main extends PluginBase implements Listener{
                return;
           }else{
                foreach($signs as $s){
-                    if($s["x"] === $x && $s["y"] === $y && $s["z"] === $z && $s["level"] === $level){
+                    if($s["posx"] === $x && $s["posy"] === $y && $s["posz"] === $z && $s["level"] === $level){
                          if($p->hasPermission("cshop.buy.sign")){
                               $this->buyCmd($s["cmd"], $p);
                          }else{
