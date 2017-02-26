@@ -30,6 +30,5 @@ commands:
 
 # List and database for CommandShop signs:
 
-signs:
-
+signs: []
 ...
