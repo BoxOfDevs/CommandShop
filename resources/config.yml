@@ -23,10 +23,10 @@ commands:
   example:
     cmds: 
      - "tp {player} 123 123 123"
+    buycmd: "true"
     price:
       paytype: "item"
       item: "1:0:64"
-    buycmd: true
 
 # List and database for CommandShop signs:
 
