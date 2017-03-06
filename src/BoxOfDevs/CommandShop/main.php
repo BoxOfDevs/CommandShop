@@ -25,7 +25,8 @@ class main extends PluginBase implements Listener{
      
      const PREFIX = TF::YELLOW . "[CommandShop]" . TF::WHITE . " ";
      const ERROR = TF::YELLOW . "[CommandShop]" . TF::RED . " [ERROR]" . TF::WHITE . " ";
-     public $signsetters;
+     public $signsetters = [];
+     public $confirms = [];
 
 
      /*
@@ -442,10 +443,21 @@ class main extends PluginBase implements Listener{
                $p->sendMessage(self::PREFIX . TF::GREEN . "Sign has been successfully created!");
                return;
           }else{
-               foreach($signs as $s){
+               foreach($signs as $index => $s){
                     if($s["posx"] === $x && $s["posy"] === $y && $s["posz"] === $z && $s["level"] === $level){
                          if($p->hasPermission("cshop.buy.sign")){
-                              $this->buyCmd($s["cmd"], $p);
+                              if(isset($this->confirms[$p->getName()])){
+                                   if($this->confirms[$p->getName()] === $index){
+                                        $this->buyCmd($s["cmd"], $p);
+                                        unset($this->confirms[$p->getName()]);
+                                        return;
+                                   }else{
+                                        unset($this->confirms[$p->getName()]);
+                                   }
+                              }
+                              $this->confirms[$p->getName()] = $index;
+                              $replacers = ["{cmd}" => $s["cmd"]];
+                              $p->sendMessage($this->getMessage("sign.confirm", $replacers));
                          }else{
                               $p->sendMessage($this->getMessage("sign.noperm"));
                          }

@@ -13,6 +13,7 @@ buy.contactadmin: "{line}If you are a normal user, please contact your server ad
 
 command.notfound: "{error}Command {cmd} wasn't found in the list of buyable commands!"
 
+sign.confirm: "{prefix}Tap the sign again to confirm that you want to buy the command {cmd}!"
 sign.noperm: "{error}You don't have the permission to buy commands via signs!"
 
 buycmd.disabled: "{error}/buycmd is disabled for this buyable command!"
