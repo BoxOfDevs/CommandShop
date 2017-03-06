@@ -324,6 +324,20 @@ class main extends PluginBase implements Listener{
                                    $sender->sendMessage($this->getMessage("command.notfound", $replacers));
                               }
                               break;
+                         case "addcmd":
+                              $cmds = $this->getConfig()->get("commands", []);
+                              if(count($args) < 2) return false;
+                              $cmd = strtolower(array_shift($args));
+                              $command = strtolower(implode(" ", $args));
+                              if(isset($cmds[$cmd])){
+                                   $cmdl = $cmds[$cmd]["cmds"];
+                                   $cmdl[] = $command;
+                                   $sender->sendMessage(self::PREFIX . TF::GREEN . "Successfully added the command to $cmd!");
+                                   $sender->sendMessage(self::PREFIX . TF::AQUA . "Command that was added: " . TF::WHITE . "/" . $command);
+                              }else{
+                                   $replacers = ["{cmd}" => $cmd];
+                                   $sender->sendMessage($this->getMessage("command.notfound", $replacers));
+                              }
                          case "list":
                               $cmds = $this->getConfig()->get("commands", []);
                               if($cmds != []){
