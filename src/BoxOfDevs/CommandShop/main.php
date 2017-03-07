@@ -431,7 +431,18 @@ class main extends PluginBase implements Listener{
           $z = $sign->getBlock()->getZ();
           $signs = $this->getConfig()->get("signs", []);
           if(isset($this->signsetters[$p->getName()])){
-               $index = count($signs) + 1;
+               foreach($signs as $i => $s){
+                    if($s["posx"] === $x && $s["posy"] === $y && $s["posz"] === $z && $s["level"] === $level){
+                         unset($signs[$i]);
+                         $this->getConfig()->set("signs", $signs);
+                         $this->getConfig()->save();
+                    }
+               }
+               $signs = $this->getConfig()->get("signs", []);
+               $index = 0;
+               while(isset($signs[$index])){
+                    $index++;
+               }
                $signs[$index]["posx"] = $x;
                $signs[$index]["posy"] = $y;
                $signs[$index]["posz"] = $z;
