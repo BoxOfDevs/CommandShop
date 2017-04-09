@@ -11,8 +11,8 @@ Players have to pay items or money to use specific commands! A PocketMine plugin
 ### Please read the [wiki](https://github.com/BoxOfDevs/CommandShop/wiki) if you want to know how this plugin works!
 
 ## Download this plugin!
-You may grab the plugin from [source](https://github.com/BoxOfDevs/CommandShop/archive/master.zip), or the latest .phar from [poggit.](https://poggit.pmmp.io/ci/BoxOfDevs/CommandShop/CommandShop#) <br>
-**This plugin requires EconomyAPI to work correctly**
+You may grab the plugin from [source](https://github.com/BoxOfDevs/CommandShop/archive/master.zip), or download the latest .phar from [Poggit](https://poggit.pmmp.io/ci/BoxOfDevs/CommandShop/CommandShop).<br>
+**This plugin requires [EconomyAPI](https://github.com/onebone/EconomyS) by onebone to enable buying commands via money!**
 <br>
 
 By BoxOfDevs:
