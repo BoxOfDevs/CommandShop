@@ -1,0 +1,30 @@
+#Travis CI
+
+language: php
+
+php:
+ - 7.0.14
+
+branches:
+ - master
+
+before_script:
+ - cd /home/travis/build/
+ - pecl install channel://pecl.php.net/pthreads-3.1.6
+ - pecl install channel://pecl.php.net/weakref-0.3.3
+ - echo | pecl install channel://pecl.php.net/yaml-2.0.0
+ - git clone --recursive --branch=api3/network https://github.com/pmmp/PocketMine-MP.git
+ - mkdir -p PocketMine-MP/plugins
+ - wget https://poggit.pmmp.io/r/3530/PocketMine-DevTools.phar
+ - cp -f  PocketMine-DevTools.phar PocketMine-MP/plugins/
+ - cp -f BoxOfDevs/CommandShop/Travis.php PocketMine-MP/
+ - cp -rf BoxOfDevs/CommandShop PocketMine-MP/plugins
+ - cd PocketMine-MP/plugins/
+ - cd /home/travis/build/PocketMine-MP
+ 
+script:
+ - php Travis.php
+ 
+notifications:
+  webhooks: https://play.himbeer.me/travis-to-discord.php
+  email: false
