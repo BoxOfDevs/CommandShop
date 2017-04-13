@@ -15,7 +15,7 @@ before_script:
  - echo | pecl install channel://pecl.php.net/yaml-2.0.0
  - git clone --recursive --branch=api3/network https://github.com/pmmp/PocketMine-MP.git
  - mkdir -p PocketMine-MP/plugins
- - wget https://poggit.pmmp.io/r/3530/PocketMine-DevTools.phar
+ - curl https://poggit.pmmp.io/r/3530/PocketMine-DevTools.phar
  - cp -f  PocketMine-DevTools.phar PocketMine-MP/plugins/
  - cp -f BoxOfDevs/CommandShop/Travis.php PocketMine-MP/
  - cp -rf BoxOfDevs/CommandShop PocketMine-MP/plugins
