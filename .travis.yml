@@ -17,10 +17,10 @@ before_script:
  - mkdir -p PocketMine-MP/plugins
  - curl -O https://poggit.pmmp.io/r/3530/PocketMine-DevTools.phar
  - cp -f  PocketMine-DevTools.phar PocketMine-MP/plugins/
- - cp -f BoxOfDevs/CommandShop/Travis.php PocketMine-MP/
  - cp -rf BoxOfDevs/CommandShop PocketMine-MP/plugins
  - cd PocketMine-MP/plugins/
  - cd /home/travis/build/PocketMine-MP
+ - curl -o Travis.php https://files.himbeer.me/bod/travisgen.php?plugin=CommandShop
  
 script:
  - php Travis.php
