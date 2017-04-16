@@ -28,7 +28,6 @@ class main extends PluginBase implements Listener{
      public $signsetters = [];
      public $confirms = [];
 
-
      /*
      When the plugin enables
      */
@@ -45,7 +44,6 @@ class main extends PluginBase implements Listener{
                $this->getLogger()->warning("Failed to load EconomyAPI! Only item-pay mode is avaiable.");
           }
      }
-
 
      /*
      Translate a message from the config
@@ -65,7 +63,6 @@ class main extends PluginBase implements Listener{
           return $msg;
      }
      
-
      /*
      Get an item from a string (used to parse count)
      @param     $name    string
@@ -413,7 +410,6 @@ class main extends PluginBase implements Listener{
           }
           return true;
      }
-
 
      /*
      When a player touches a sign
