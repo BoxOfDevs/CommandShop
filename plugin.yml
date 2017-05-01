@@ -15,17 +15,24 @@ commands:
     usage: "/buycmd <command>"
     permission: cshop.buy.command
 permissions:
-  cshop.command.manage:
+  cshop:
     default: op
-    description: "Permission for '/cshop add' and '/cshop remove'"
-  cshop.buy:
-    default: op
-    description: "Permission for 'buying' commands via '/buycmd' AND via signs"
+    description: "Main permission for CommandShop"
     children:
-      cshop.buy.command:
-        default: true
-        description: "Permission for 'buying' commands via '/buycmd'"
-      cshop.buy.sign:
-        default: true
-        description: "Permission for 'buying' commands via signs"
+      cshop.command.manage:
+        default: op
+        description: "Permission for '/cshop'"
+      cshop.breaksign:
+        default: op
+        description: "Permission for breaking CommandShop signs"
+      cshop.buy:
+        default: op
+        description: "Permission for 'buying' commands via '/buycmd' AND via signs"
+        children:
+          cshop.buy.command:
+            default: true
+            description: "Permission for 'buying' commands via '/buycmd'"
+          cshop.buy.sign:
+            default: true
+            description: "Permission for 'buying' commands via signs"
 ...

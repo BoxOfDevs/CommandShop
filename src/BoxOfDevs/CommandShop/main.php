@@ -15,6 +15,7 @@ use pocketmine\Player;
 use pocketmine\Inventoy;
 use pocketmine\item\Item;
 use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\block\Block;
 use pocketmine\tile\Sign;
 use pocketmine\level\Position;
@@ -468,6 +469,34 @@ class main extends PluginBase implements Listener{
                          }else{
                               $p->sendMessage($this->getMessage("sign.noperm"));
                          }
+                         return;
+                    }
+               }
+          }
+          return;
+     }
+
+     public function onBlockBreak(BlockBreakEvent $event){
+          if($event->getBlock()->getId() != Block::SIGN_POST && $event->getBlock()->getId() != Block::WALL_SIGN) return;
+          $p = $event->getPlayer();
+          $sign = $p->getLevel()->getTile($event->getBlock());
+          $level = $p->getLevel()->getName();
+          if(!($sign instanceof Sign)) return;
+          $x = $sign->getBlock()->getX();
+          $y = $sign->getBlock()->getY();
+          $z = $sign->getBlock()->getZ();
+          $signs = $this->getConfig()->get("signs", []);
+          foreach($signs as $i => $s){
+               if($s["posx"] === $x && $s["posy"] === $y && $s["posz"] === $z && $s["level"] === $level){
+                    if($p->hasPermission("cshop.breaksign")){
+                         unset($signs[$i]);
+                         $p->sendMessage(self::PREFIX . TF::RED . "Sign has been successfully removed!");
+                         $this->getConfig()->set("signs", $signs);
+                         $this->getConfig()->save();
+                         return;
+                    }else{
+                         $p->sendMessage($this->getMessage("sign.nobreak"));
+                         $event->setCancelled(true);
                          return;
                     }
                }

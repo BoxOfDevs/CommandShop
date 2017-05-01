@@ -15,6 +15,7 @@ command.notfound: "{error}Command {cmd} wasn't found in the list of buyable comm
 
 sign.confirm: "{prefix}Tap the sign again to confirm that you want to buy the command {cmd}!"
 sign.noperm: "{error}You don't have the permission to buy commands via signs!"
+sign.nobreak: "{error}You don't have the permission to break CommandShop signs!"
 
 buycmd.disabled: "{error}/buycmd is disabled for this buyable command!"
 
