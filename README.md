@@ -21,4 +21,4 @@ By BoxOfDevs:
 ![BoxOfDevs Banner](http://files.himbeer.me/bod-banner.gif)
 
 ## License
-This work is licensed under the BoxOfDevs General Software License 1.1.1
+This work is licensed under the BoxOfDevs General Software License 1.1.3
