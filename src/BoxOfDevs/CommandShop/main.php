@@ -26,8 +26,20 @@ class main extends PluginBase implements Listener{
      
      const PREFIX = TF::YELLOW . "[CommandShop]" . TF::WHITE . " ";
      const ERROR = TF::YELLOW . "[CommandShop]" . TF::RED . " [ERROR]" . TF::WHITE . " ";
-     public $signsetters = [];
-     public $confirms = [];
+
+     protected $signsetters = [];
+     protected $confirms = [];
+     protected $usages = [
+          "add" => "<name> <command>",
+          "remove" => "<name>",
+          "setprice" => "<name> <money|item> <money-amount|item-id>",
+          "sign" => "<name>",
+          "buycmd" => "<name> <false|true>",
+          "addcmd" => "<name> <command>",
+          "list" => "",
+          "info" => "<name>",
+          "help" => ""
+     ];
 
      /*
      When the plugin enables
@@ -63,7 +75,18 @@ class main extends PluginBase implements Listener{
           $msg = str_ireplace(array_keys($values), array_values($values), $msg);
           return $msg;
      }
-     
+
+     /*
+     Send the usage of a Command to a Player
+     @param     $msg    string
+     @param     $replacers    array
+     @return string
+     */
+     public function sendUsage(string $cmd, $p): string{
+          $p->sendMessage(self::ERROR . "Usage: /cshop $cmd " . $this->usages[$cmd]);
+          return true;
+     }
+
      /*
      Get an item from a string (used to parse count)
      @param     $name    string
@@ -118,26 +141,26 @@ class main extends PluginBase implements Listener{
      @return void
      */
      public function remove(Item $item, \pocketmine\inventory\BaseInventory $inventory){
-		$checkDamage = !$item->hasAnyDamageValue();
-		$checkTags = $item->hasCompoundTag();
-		$checkCount = $item->getCount() === null ? false : true;
-		$count = $item->getCount();
+        $checkDamage = !$item->hasAnyDamageValue();
+        $checkTags = $item->hasCompoundTag();
+        $checkCount = $item->getCount() === null ? false : true;
+        $count = $item->getCount();
 
-		foreach($inventory->getContents() as $index => $i){
-			if($item->equals($i, $checkDamage, $checkTags)){
-				if($checkCount && $i->getCount() > $item->getCount()) {
-					$i->setCount($i->getCount() - $count);
-					$inventory->setItem($index, $i);
-					return;
-				} elseif($checkCount && $i->getCount() < $item->getCount()) {
-					$count -= $i->getCount();
-					$inventory->clear($index);
-				} else {
-					$inventory->clear($index);
-				}
-			}
-		}
-	}
+        foreach($inventory->getContents() as $index => $i){
+            if($item->equals($i, $checkDamage, $checkTags)){
+                if($checkCount && $i->getCount() > $item->getCount()) {
+                    $i->setCount($i->getCount() - $count);
+                    $inventory->setItem($index, $i);
+                    return;
+                } elseif($checkCount && $i->getCount() < $item->getCount()) {
+                    $count -= $i->getCount();
+                    $inventory->clear($index);
+                } else {
+                    $inventory->clear($index);
+                }
+            }
+        }
+    }
 
      /*
      Buy a command
@@ -211,7 +234,10 @@ class main extends PluginBase implements Listener{
                     $subcmd = strtolower(array_shift($args));
                     switch($subcmd){
                          case "add":
-                              if(count($args) < 2) return false;
+                              if(count($args) < 2){
+                                   $this->sendUsage($subcmd, $sender);
+                                   return true;
+                              }
                               $name = strtolower(array_shift($args));
                               $cmd = strtolower(implode(" ", $args));
                               $cmds = $this->getConfig()->get("commands", []);
@@ -230,7 +256,10 @@ class main extends PluginBase implements Listener{
                               }
                               break;
                          case "remove":
-                              if(count($args) < 1) return false;
+                              if(count($args) < 1){
+                                   $this->sendUsage($subcmd, $sender);
+                                   return true;
+                              }
                               $name = strtolower(array_shift($args));
                               $cmds = $this->getConfig()->get("commands", []);
                               if(isset($cmds[$name])){
@@ -244,13 +273,19 @@ class main extends PluginBase implements Listener{
                               }
                               break;
                          case "setprice":
-                              if(count($args) < 3) return false;
+                              if(count($args) < 3){
+                                   $this->sendUsage($subcmd, $sender);
+                                   return true;
+                              }
                               $cmd = strtolower(array_shift($args));
                               $type = strtolower(array_shift($args));
                               if($type === "money"){
                                    if($this->economy != null){
                                         $amount = array_shift($args);
-                                        if(!is_numeric($amount)) return false;
+                                        if(!is_numeric($amount)){
+                                             $this->sendUsage($subcmd, $sender);
+                                             return true;
+                                        }
                                         $cmds = $this->getConfig()->get("commands", []);
                                         if(isset($cmds[$cmd])){
                                              $cmds[$cmd]["price"]["paytype"] = "money";
@@ -280,7 +315,8 @@ class main extends PluginBase implements Listener{
                                         $sender->sendMessage($this->getMessage("command.notfound", $replacers));
                                    }
                               }else{
-                                   return false;
+                                   $this->sendUsage($subcmd, $sender);
+                                   return true;
                               }
                               break;
                          case "sign":
@@ -288,7 +324,10 @@ class main extends PluginBase implements Listener{
                                    $sender->sendMessage(self::ERROR . "Please use this command in-game!");
                                    break;
                               }
-                              if(count($args) < 1) return false;
+                              if(count($args) < 1){
+                                   $this->sendUsage($subcmd, $sender);
+                                   return true;
+                              }
                               $cmd = strtolower(array_shift($args));
                               $cmds = $this->getConfig()->get("commands", []);
                               if(isset($cmds[$cmd])){
@@ -300,7 +339,10 @@ class main extends PluginBase implements Listener{
                               }
                               break;
                          case "buycmd":
-                              if(count($args) < 2) return false;
+                              if(count($args) < 2){
+                                   $this->sendUsage($subcmd, $sender);
+                                   return true;
+                              }
                               $cmds = $this->getConfig()->get("commands", []);
                               $cmd = strtolower(array_shift($args));
                               $bool = strtolower(array_shift($args));
@@ -316,7 +358,8 @@ class main extends PluginBase implements Listener{
                                         $this->getConfig()->save();
                                         $sender->sendMessage(self::PREFIX . "/buycmd has been successfully disabled for $cmd");
                                    }else{
-                                        return false;
+                                        $this->sendUsage($subcmd, $sender);
+                                        return true;
                                    }
                               }else{
                                    $replacers = ["{cmd}" => $cmd];
@@ -325,7 +368,10 @@ class main extends PluginBase implements Listener{
                               break;
                          case "addcmd":
                               $cmds = $this->getConfig()->get("commands", []);
-                              if(count($args) < 2) return false;
+                              if(count($args) < 2){
+                                   $this->sendUsage($subcmd, $sender);
+                                   return true;
+                              }
                               $cmd = strtolower(array_shift($args));
                               $command = strtolower(implode(" ", $args));
                               if(isset($cmds[$cmd])){
@@ -350,7 +396,10 @@ class main extends PluginBase implements Listener{
                               }
                               break;
                          case "info":
-                              if(count($args) < 1) return false;
+                              if(count($args) < 1){
+                                   $this->sendUsage($subcmd, $sender);
+                                   return true;
+                              }
                               $cmdn = strtolower(array_shift($args));
                               $cmds = $this->getConfig()->get("commands", []);
                               if(isset($cmds[$cmdn])){
@@ -382,7 +431,11 @@ class main extends PluginBase implements Listener{
                               }
                               break;
                          case "help":
-                              $sender->sendMessage("Please visit the wiki for this plugin here: https://github.com/BoxOfDevs/CommandShop/wiki");
+                              $sender->sendMessage(self::PREFIX . "CommandShop Commands:");
+                              foreach ($this->usages as $cmd => $usage) {
+                                   $sender->sendMessage("/cshop $cmd $usage");
+                              }
+                              $sender->sendMessage("/buycmd <command>\nPlease visit the wiki for this plugin here: https://github.com/BoxOfDevs/CommandShop/wiki for further information.");
                               break;
                          default:
                               return false;
