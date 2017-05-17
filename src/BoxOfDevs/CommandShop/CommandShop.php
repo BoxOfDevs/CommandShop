@@ -16,7 +16,7 @@ use pocketmine\tile\Sign;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat as TF;
 
-class main extends PluginBase implements Listener{
+class CommandShop extends PluginBase implements Listener{
      
      const PREFIX = TF::YELLOW . "[CommandShop]" . TF::WHITE . " ";
      const ERROR = TF::YELLOW . "[CommandShop]" . TF::RED . " [ERROR]" . TF::WHITE . " ";
