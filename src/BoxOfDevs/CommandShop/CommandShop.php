@@ -2,18 +2,14 @@
 
 namespace BoxOfDevs\CommandShop;
 
-use pocketmine\block\Block;
+use onebone\economyapi\EconomyAPI;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\command\ConsoleCommandSender;
-use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\Listener;
-use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\item\Item;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
-use pocketmine\tile\Sign;
-use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat as TF;
 
 class CommandShop extends PluginBase implements Listener{
@@ -22,8 +18,8 @@ class CommandShop extends PluginBase implements Listener{
      const ERROR = TF::YELLOW . "[CommandShop]" . TF::RED . " [ERROR]" . TF::WHITE . " ";
 
      protected $economy;
-     protected $signsetters = [];
-     protected $confirms = [];
+     public $signsetters = [];
+     public $confirms = [];
      protected $usages = [
           "add" => "<name> <command>",
           "remove" => "<name>",
@@ -36,15 +32,15 @@ class CommandShop extends PluginBase implements Listener{
           "help" => ""
      ];
 
-     /*
+     /**
      When the plugin enables
      */
      public function onEnable(){
-          $this->getServer()->getPluginManager()->registerEvents($this,$this);
+          $this->getServer()->getPluginManager()->registerEvents(new CShopListener($this),$this);
           $this->getLogger()->info("CommandShop by BoxOfDevs enabled!");
           $this->saveDefaultConfig();
           if($this->getServer()->getPluginManager()->getPlugin("EconomyAPI") != null){
-               $this->economy = $this->getServer()->getPluginManager()->getPlugin("EconomyAPI");
+               $this->economy = EconomyAPI::getInstance();
                $this->getLogger()->notice("EconomyAPI successfully detected!");
           }else{
                $this->economy = null;
@@ -52,12 +48,13 @@ class CommandShop extends PluginBase implements Listener{
           }
      }
 
-     /*
-     Translate a message from the config
-     @param     $msg    string
-     @param     $replacers    array
-     @return string
-     */
+     /**
+      * Translates a message from config
+      *
+      * @param string $msg
+      * @param array  $replacers
+      * @return string
+      */
      public function getMessage(string $msg, array $replacers = []): string{
           $msg = $this->getConfig()->get($msg);
           $msg = str_ireplace(array_keys($replacers), array_values($replacers), $msg);
@@ -70,22 +67,24 @@ class CommandShop extends PluginBase implements Listener{
           return $msg;
      }
 
-     /*
-     Send the usage of a Command to a Player
-     @param     $msg    string
-     @param     $replacers    array
-     @return string
-     */
+     /**
+      * Send the usage of a Command to a Player
+      *
+      * @param string $cmd
+      * @param        $p
+      * @return string
+      */
      public function sendUsage(string $cmd, $p): string{
           $p->sendMessage(self::ERROR . "Usage: /cshop $cmd " . $this->usages[$cmd]);
           return true;
      }
 
-     /*
-     Get an item from a string (used to parse count)
-     @param     $name    string
-     @return \pocketmine\item\Item
-     */
+     /**
+      * Get an item from a string (used to parse count)
+      *
+      * @param string $name
+      * @return Item
+      */
      public function getItem(string $name): Item{
           if(strpos($name, ":") != false){
                $arr = explode(":", $name);
@@ -110,12 +109,12 @@ class CommandShop extends PluginBase implements Listener{
           return $item;
      }
 
-     /*
-     Execute command as console
-     @param     $cmds    array
-     @param     $p    Player
-     @return void
-     */
+     /**
+      * Execute command as console
+      *
+      * @param array  $cmds
+      * @param Player $p
+      */
      public function executeCommands(array $cmds, Player $p){
           $cmds = str_replace("{player}", $p->getName(), $cmds);
           $cmds = str_replace("{level}", $p->getLevel()->getName(), $cmds);
@@ -128,12 +127,12 @@ class CommandShop extends PluginBase implements Listener{
           return;
      }
 
-     /*
-     Removes an item from a player's invenotry (solving count issues with soft)
-     @param     $item    Item
-     @param     $inventory    \pocketmine\inventory\BaseInventory
-     @return void
-     */
+     /**
+      * Removes an item from a player's invenotry (solving count issues with soft)
+      *
+      * @param Item                                $item
+      * @param \pocketmine\inventory\BaseInventory $inventory
+      */
      public function remove(Item $item, \pocketmine\inventory\BaseInventory $inventory){
         $checkDamage = !$item->hasAnyDamageValue();
         $checkTags = $item->hasCompoundTag();
@@ -156,12 +155,13 @@ class CommandShop extends PluginBase implements Listener{
         }
     }
 
-     /*
-     Buy a command
-     @param     $cmd    string
-     @param     $p    Player
-     @return bool
-     */
+     /**
+      * Buy a command
+      *
+      * @param string $cmd
+      * @param Player $p
+      * @return bool
+      */
      public function buyCmd(string $cmd, Player $p): bool{
           if($p instanceof Player){
                $name = $p->getName();
@@ -214,14 +214,15 @@ class CommandShop extends PluginBase implements Listener{
           return false;
      }
 
-     /*
-     Called when one of the defined commands of the plugin has been called
-     @param     $sender     \pocketmine\command\CommandSender
-     @param     $command          \pocketmine\command\Command
-     @param     $label         mixed
-     @param     $args          array
-     return bool
-     */
+     /**
+      * Called when one of the defined commands of the plugin has been called
+      *
+      * @param CommandSender $sender
+      * @param Command       $command
+      * @param string        $label
+      * @param array         $args
+      * @return bool
+      */
      public function onCommand(CommandSender $sender, Command $command, $label, array $args){
           switch($command->getName()){
                case "cshop":
@@ -457,97 +458,5 @@ class CommandShop extends PluginBase implements Listener{
                     break;
           }
           return true;
-     }
-
-     /*
-     When a player touches a sign
-     @param     $event    \pocketmine\event\player\PlayerInteractEvent
-     @return bool
-     */
-     public function onSignTouch(PlayerInteractEvent $event){
-          if($event->getBlock()->getId() != Block::SIGN_POST && $event->getBlock()->getId() != Block::WALL_SIGN) return;
-          $p = $event->getPlayer();
-          $sign = $p->getLevel()->getTile($event->getBlock());
-          $level = $p->getLevel()->getName();
-          if(!($sign instanceof Sign)) return;
-          $x = $sign->getBlock()->getX();
-          $y = $sign->getBlock()->getY();
-          $z = $sign->getBlock()->getZ();
-          $signs = $this->getConfig()->get("signs", []);
-          if(isset($this->signsetters[$p->getName()])){
-               foreach($signs as $i => $s){
-                    if($s["posx"] === $x && $s["posy"] === $y && $s["posz"] === $z && $s["level"] === $level){
-                         unset($signs[$i]);
-                         $this->getConfig()->set("signs", $signs);
-                         $this->getConfig()->save();
-                    }
-               }
-               $signs = $this->getConfig()->get("signs", []);
-               $index = 0;
-               while(isset($signs[$index])){
-                    $index++;
-               }
-               $signs[$index]["posx"] = $x;
-               $signs[$index]["posy"] = $y;
-               $signs[$index]["posz"] = $z;
-               $signs[$index]["level"] = $level;
-               $signs[$index]["cmd"] = $this->signsetters[$p->getName()];
-               $this->getConfig()->set("signs", $signs);
-               $this->getConfig()->save();
-               unset($this->signsetters[$p->getName()]);
-               $p->sendMessage(self::PREFIX . TF::GREEN . "Sign has been successfully created!");
-               return;
-          }else{
-               foreach($signs as $index => $s){
-                    if($s["posx"] === $x && $s["posy"] === $y && $s["posz"] === $z && $s["level"] === $level){
-                         if($p->hasPermission("cshop.buy.sign")){
-                              if(isset($this->confirms[$p->getName()])){
-                                   if($this->confirms[$p->getName()] === $index){
-                                        $this->buyCmd($s["cmd"], $p);
-                                        unset($this->confirms[$p->getName()]);
-                                        return;
-                                   }else{
-                                        unset($this->confirms[$p->getName()]);
-                                   }
-                              }
-                              $this->confirms[$p->getName()] = $index;
-                              $replacers = ["{cmd}" => $s["cmd"]];
-                              $p->sendMessage($this->getMessage("sign.confirm", $replacers));
-                         }else{
-                              $p->sendMessage($this->getMessage("sign.noperm"));
-                         }
-                         return;
-                    }
-               }
-          }
-          return;
-     }
-
-     public function onBlockBreak(BlockBreakEvent $event){
-          if($event->getBlock()->getId() != Block::SIGN_POST && $event->getBlock()->getId() != Block::WALL_SIGN) return;
-          $p = $event->getPlayer();
-          $sign = $p->getLevel()->getTile($event->getBlock());
-          $level = $p->getLevel()->getName();
-          if(!($sign instanceof Sign)) return;
-          $x = $sign->getBlock()->getX();
-          $y = $sign->getBlock()->getY();
-          $z = $sign->getBlock()->getZ();
-          $signs = $this->getConfig()->get("signs", []);
-          foreach($signs as $i => $s){
-               if($s["posx"] === $x && $s["posy"] === $y && $s["posz"] === $z && $s["level"] === $level){
-                    if($p->hasPermission("cshop.breaksign")){
-                         unset($signs[$i]);
-                         $p->sendMessage(self::PREFIX . TF::RED . "Sign has been successfully removed!");
-                         $this->getConfig()->set("signs", $signs);
-                         $this->getConfig()->save();
-                         return;
-                    }else{
-                         $p->sendMessage($this->getMessage("sign.nobreak"));
-                         $event->setCancelled(true);
-                         return;
-                    }
-               }
-          }
-          return;
      }
 }
