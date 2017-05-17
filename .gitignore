@@ -6,6 +6,12 @@ config.yml
 !resources/config.yml
 
 #################
+## PhpStorm
+#################
+
+.idea/
+
+#################
 ## Eclipse
 #################
 
