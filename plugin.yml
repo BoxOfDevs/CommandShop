@@ -2,7 +2,7 @@
 name: CommandShop
 author: BoxOfDevs Team
 version: 1.0.0
-main: BoxOfDevs\CommandShop\main
+main: BoxOfDevs\CommandShop\CommandShop
 api: [2.0.0, 2.1.0, 3.0.0-ALPHA2, 3.0.0-ALPHA3, 3.0.0-ALPHA4, 3.0.0-ALPHA5]
 softdepend: EconomyAPI
 commands: 
