@@ -2,31 +2,26 @@
 
 namespace BoxOfDevs\CommandShop;
 
-use pocketmine\plugin\PluginBase;
-use pocketmine\event\Listener;
+use pocketmine\block\Block;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\command\ConsoleCommandSender;
+use pocketmine\event\block\BlockBreakEvent;
+use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\item\Item;
+use pocketmine\Player;
+use pocketmine\plugin\PluginBase;
+use pocketmine\tile\Sign;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat as TF;
-use pocketmine\Server;
-use pocketmine\permission\Permission;
-use pocketmine\Player;
-use pocketmine\Inventoy;
-use pocketmine\item\Item;
-use pocketmine\event\player\PlayerInteractEvent;
-use pocketmine\event\block\BlockBreakEvent;
-use pocketmine\block\Block;
-use pocketmine\tile\Sign;
-use pocketmine\level\Position;
-use pocketmine\math\Vector3;
-use onebone\economyapi\EconomyAPI;
 
 class main extends PluginBase implements Listener{
      
      const PREFIX = TF::YELLOW . "[CommandShop]" . TF::WHITE . " ";
      const ERROR = TF::YELLOW . "[CommandShop]" . TF::RED . " [ERROR]" . TF::WHITE . " ";
 
+     protected $economy;
      protected $signsetters = [];
      protected $confirms = [];
      protected $usages = [
@@ -48,7 +43,6 @@ class main extends PluginBase implements Listener{
           $this->getServer()->getPluginManager()->registerEvents($this,$this);
           $this->getLogger()->info("CommandShop by BoxOfDevs enabled!");
           $this->saveDefaultConfig();
-          $this->config = new Config($this->getDataFolder(). "config.yml", Config::YAML);
           if($this->getServer()->getPluginManager()->getPlugin("EconomyAPI") != null){
                $this->economy = $this->getServer()->getPluginManager()->getPlugin("EconomyAPI");
                $this->getLogger()->notice("EconomyAPI successfully detected!");
