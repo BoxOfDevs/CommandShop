@@ -33,8 +33,8 @@ class CommandShop extends PluginBase implements Listener{
      ];
 
      /**
-     When the plugin enables
-     */
+      * When the plugin enables
+      */
      public function onEnable(){
           $this->getServer()->getPluginManager()->registerEvents(new CShopListener($this),$this);
           $this->getLogger()->info("CommandShop by BoxOfDevs enabled!");
