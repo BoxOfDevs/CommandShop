@@ -1,6 +1,6 @@
 # CommandShop
 
-[![Poggit-CI](https://poggit.pmmp.io/ci.badge/BoxOfDevs/CommandShop/CommandShop)](https://poggit.pmmp.io/ci/BoxOfDevs/CommandShop/CommandShop)
+[![Poggit-CI](https://poggit.pmmp.io/ci.shield/BoxOfDevs/CommandShop/CommandShop)](https://poggit.pmmp.io/ci/BoxOfDevs/CommandShop/CommandShop)
 [![Build Status](https://travis-ci.org/BoxOfDevs/CommandShop.svg?branch=master)](https://travis-ci.org/BoxOfDevs/CommandShop)
 
 [Come chat with us on Discord!](https://discord.gg/tcT9VDt)
