@@ -1,5 +1,8 @@
 #Travis CI
 
+dist: trusty
+sudo: false
+
 language: php
 
 php:
