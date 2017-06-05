@@ -13,18 +13,13 @@ before_script:
  - pecl install channel://pecl.php.net/pthreads-3.1.6
  - pecl install channel://pecl.php.net/weakref-0.3.3
  - echo | pecl install channel://pecl.php.net/yaml-2.0.0
- - git clone --recursive --branch=api3/network https://github.com/pmmp/PocketMine-MP.git
- - mkdir -p PocketMine-MP/plugins
- - curl -O https://poggit.pmmp.io/r/3530/PocketMine-DevTools.phar
- - cp -f  PocketMine-DevTools.phar PocketMine-MP/plugins/
- - cp -rf BoxOfDevs/CommandShop PocketMine-MP/plugins
- - cd PocketMine-MP/plugins/
- - cd /home/travis/build/PocketMine-MP
- - curl -o Travis.php https://files.himbeer.me/bod/travisgen.php?plugin=CommandShop
- 
+
 script:
- - php Travis.php
+ - curl -o Travis.sh 'https://cloud.himbeer.me/bod/travisgen.php?slug='$TRAVIS_REPO_SLUG'&type=shell'
+ - cat Travis.sh
+ - chmod +x Travis.sh
+ - ./Travis.sh
  
 notifications:
-  webhooks: https://play.himbeer.me/travis-to-discord.php
+  webhooks: https://cloud.himbeer.me/bod/travis-to-discord.php
   email: false
