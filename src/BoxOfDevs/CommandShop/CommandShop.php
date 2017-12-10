@@ -116,7 +116,7 @@ class CommandShop extends PluginBase implements Listener{
       * @param Player $p
       */
      public function executeCommands(array $cmds, Player $p){
-          $cmds = str_replace("{player}", $p->getName(), $cmds);
+          $cmds = str_replace("{player}", '"'.$p->getName().'"', $cmds);
           $cmds = str_replace("{level}", $p->getLevel()->getName(), $cmds);
           $cmds = str_replace("{x}", round($p->x, 0), $cmds);
           $cmds = str_replace("{y}", round($p->y, 0), $cmds);
