@@ -5,9 +5,9 @@
 
 ### Need a .phar for PMMP with the ALPHA7 API? Go ahead: https://poggit.pmmp.io/ci/BoxOfDevs/CommandShop/CommandShop?branch=alpha7
 
-[Come chat with us on Discord!](https://discord.gg/tcT9VDt)
+[Come chat with us on Discord!](https://discord.me/bod)
 
-[<img src="https://discordapp.com/assets/fc0b01fe10a0b8c602fb0106d8189d9b.png" width="162" height= "55">](https://discord.gg/tcT9VDt)
+[<img src="https://discordapp.com/assets/fc0b01fe10a0b8c602fb0106d8189d9b.png" width="162" height= "55">](https://discord.me/bod)
 
 Players have to pay items or money to use specific commands! A PocketMine plugin.
 
