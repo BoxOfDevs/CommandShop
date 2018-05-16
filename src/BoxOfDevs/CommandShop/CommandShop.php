@@ -400,7 +400,7 @@ class CommandShop extends PluginBase implements Listener{
                               if(isset($cmds[$cmdn])){
                                    $cmd = $cmds[$cmdn];
                                    $sender->sendMessage(self::PREFIX . "Information for the command $cmdn:");
-                                   $commands = "Commands: \n" . implode("\n", $cmd["cmds"]);
+                                   $commands = "Commands: \n" . implode("\n- ", $cmd["cmds"]);
                                    $sender->sendMessage($commands);
                                    $sender->sendMessage("/buycmd: " . $cmd["buycmd"]);
                                    if(isset($cmd["price"])){
