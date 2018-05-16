@@ -37,14 +37,13 @@ class CommandShop extends PluginBase implements Listener{
       */
      public function onEnable(){
           $this->getServer()->getPluginManager()->registerEvents(new CShopListener($this),$this);
-          $this->getLogger()->info("CommandShop by BoxOfDevs enabled!");
           $this->saveDefaultConfig();
           if($this->getServer()->getPluginManager()->getPlugin("EconomyAPI") != null){
                $this->economy = EconomyAPI::getInstance();
                $this->getLogger()->notice("EconomyAPI successfully detected!");
           }else{
                $this->economy = null;
-               $this->getLogger()->warning("Failed to load EconomyAPI! Only item-pay mode is avaiable.");
+               $this->getLogger()->notice("Failed to load EconomyAPI! Only item-pay mode is avaiable.");
           }
      }
 
