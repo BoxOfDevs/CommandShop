@@ -333,7 +333,7 @@ class CommandShop extends PluginBase implements Listener{
                               }
                               break;
                          case "buycmd":
-                              if(count($args) < 2){
+                              if(count($args) < 2 || ($args[1] !== "true" && $args[1] !== "false")){
                                    $this->sendUsage($subcmd, $sender);
                                    return true;
                               }
@@ -341,20 +341,10 @@ class CommandShop extends PluginBase implements Listener{
                               $cmd = strtolower(array_shift($args));
                               $bool = strtolower(array_shift($args));
                               if(isset($cmds[$cmd])){
-                                   if($bool === "true"){
-                                        $cmds[$cmd]["buycmd"] = "true";
-                                        $this->getConfig()->get("commands", $cmds);
-                                        $this->getConfig()->save();
-                                        $sender->sendMessage(self::PREFIX . "/buycmd has been successfully enabled for $cmd");
-                                   }elseif($bool === "false"){
-                                        $cmds[$cmd]["buycmd"] = "false";
-                                        $this->getConfig()->get("commands", $cmds);
-                                        $this->getConfig()->save();
-                                        $sender->sendMessage(self::PREFIX . "/buycmd has been successfully disabled for $cmd");
-                                   }else{
-                                        $this->sendUsage($subcmd, $sender);
-                                        return true;
-                                   }
+                                   $cmds[$cmd]["buycmd"] = $bool;
+                                   $this->getConfig()->set("commands", $cmds);
+                                   $this->getConfig()->save();
+                                   $sender->sendMessage(self::PREFIX . "/buycmd has been successfully " . ($bool === "true" ? "enabled" : "disabled") . " for $cmd");
                               }else{
                                    $replacers = ["{cmd}" => $cmd];
                                    $sender->sendMessage($this->getMessage("command.notfound", $replacers));
