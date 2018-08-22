@@ -12,6 +12,7 @@ use pocketmine\utils\TextFormat as TF;
 class CShopListener implements Listener{
 
      protected $cs;
+     protected $interactCooldowns = [];
 
      public function __construct(CommandShop $cs){
           $this->cs = $cs;
@@ -25,6 +26,15 @@ class CShopListener implements Listener{
      public function onSignTouch(PlayerInteractEvent $event){
           if($event->getBlock()->getId() != Block::SIGN_POST && $event->getBlock()->getId() != Block::WALL_SIGN) return;
           $p = $event->getPlayer();
+
+          // Hack for fixing MC's interact packet spam using a cooldown (Part 1)
+          $pName = $p->getName();
+          if (isset($this->interactCooldowns[$pName]) && $this->interactCooldowns[$pName] + 0.5 > microtime(true)) {
+               $this->cs->getLogger()->info("Blocked 1 Interact spam");
+               return;
+          }
+          $this->interactCooldowns[$pName] = microtime(true);
+
           $sign = $p->getLevel()->getTile($event->getBlock());
           $level = $p->getLevel()->getName();
           if(!($sign instanceof Sign)) return;
