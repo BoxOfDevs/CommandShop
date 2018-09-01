@@ -30,7 +30,6 @@ class CShopListener implements Listener{
           // Hack for fixing MC's interact packet spam using a cooldown (Part 1)
           $pName = $p->getName();
           if (isset($this->interactCooldowns[$pName]) && $this->interactCooldowns[$pName] + 0.5 > microtime(true)) {
-               $this->cs->getLogger()->info("Blocked 1 Interact spam");
                return;
           }
           $this->interactCooldowns[$pName] = microtime(true);
