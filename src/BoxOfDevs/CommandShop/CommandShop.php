@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BoxOfDevs\CommandShop;
 
-use onebone\economyapi\EconomyAPI;
+use BoxOfDevs\CommandShop\Commands\CShopManagementCommand;
+use BoxOfDevs\CommandShop\CShopCommand\CShopCommand;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\command\ConsoleCommandSender;
@@ -17,34 +20,78 @@ class CommandShop extends PluginBase implements Listener{
      const PREFIX = TF::YELLOW . "[CommandShop]" . TF::WHITE . " ";
      const ERROR = TF::YELLOW . "[CommandShop]" . TF::RED . " [ERROR]" . TF::WHITE . " ";
 
-     protected $economy;
+     /** @var CShopCommand[] */
      public $signsetters = [];
+
      public $confirms = [];
-     protected $usages = [
-          "add" => "<name> <command>",
-          "remove" => "<name>",
-          "setprice" => "<name> <money|item> <money-amount|item-id>",
-          "sign" => "<name>",
-          "buycmd" => "<name> <false|true>",
-          "addcmd" => "<name> <command>",
-          "list" => "",
-          "info" => "<name>",
-          "help" => ""
-     ];
+
+     /** @var string[] */
+     private $paymentMethods = [];
+
+     /** @var CShopCommand[] */
+     private $commands = [];
+
+     private function initPaymentMethods(): void {
+          $prefix = __NAMESPACE__ . "\\CShopCommand\\PaymentMethod\\";
+          $this->paymentMethods["item"] = $prefix . "ItemMethod";
+          $this->paymentMethods["money"] = $prefix . "EconomyApiMethod";
+     }
+
+     public function getPaymentMethod(string $name): ?string {
+          // TODO: Implement this in a way that isn't an eyesore
+          if (!isset($this->paymentMethods[$name])) return null;
+          return $this->paymentMethods[$name];
+     }
+
+     public function loadCSCommands(): void {
+          $commands = $this->getConfig()->getAll()["commands"];
+          foreach ($commands as $name => $cmd) {
+               $cmd["name"] = $name;
+               $this->commands[] = CShopCommand::jsonDeserialize($cmd);
+          }
+     }
+
+     public function saveCSCommands() {
+          $this->getConfig()->set("commands_new", json_encode($this->commands));
+          $this->getConfig()->save();
+     }
+
+     public function getCSCommands(): array {
+          return $this->commands;
+     }
+
+     public function getCSCommand(string $name): ?CShopCommand {
+          if (!isset($this->commands[$name])) return null;
+          return $this->commands[$name];
+     }
+
+     public function setCSCommand(string $name, CShopCommand $command, bool $save = false): void {
+          $this->commands[$name] = $command;
+          if ($save) $this->saveCSCommands();
+     }
+
+     public function removeCSCommand(string $name, bool $save = false): bool {
+          if ($this->getCSCommand($name) === null) return false;
+          unset($this->commands[$name]);
+          if ($save) $this->saveCSCommands();
+          return true;
+     }
+
+     public function addCSCommand(CShopCommand $command, bool $save = false): bool {
+          if ($this->getCSCommand($command->getName()) !== null) return false;
+          $this->setCSCommand($command->getName(), $command, $save);
+          return true;
+     }
 
      /**
       * When the plugin enables
       */
      public function onEnable(){
           $this->getServer()->getPluginManager()->registerEvents(new CShopListener($this),$this);
+          $this->getServer()->getCommandMap()->register("commandshop", new CShopManagementCommand($this));
           $this->saveDefaultConfig();
-          if($this->getServer()->getPluginManager()->getPlugin("EconomyAPI") != null){
-               $this->economy = EconomyAPI::getInstance();
-               $this->getLogger()->notice("EconomyAPI successfully detected!");
-          }else{
-               $this->economy = null;
-               $this->getLogger()->notice("Failed to load EconomyAPI! Only item-pay mode is avaiable.");
-          }
+          $this->initPaymentMethods();
+          $this->loadCSCommands();
      }
 
      /**
@@ -70,12 +117,10 @@ class CommandShop extends PluginBase implements Listener{
       * Send the usage of a Command to a Player
       *
       * @param string $cmd
-      * @param        $p
-      * @return string
+      * @param CommandSender $p
       */
-     public function sendUsage(string $cmd, $p): string{
+     public function sendUsage(string $cmd, CommandSender $p) {
           $p->sendMessage(self::ERROR . "Usage: /cshop $cmd " . $this->usages[$cmd]);
-          return true;
      }
 
      /**
@@ -224,207 +269,6 @@ class CommandShop extends PluginBase implements Listener{
       */
      public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool{
           switch($command->getName()){
-               case "cshop":
-                    $subcmd = strtolower(array_shift($args));
-                    switch($subcmd){
-                         case "add":
-                              if(count($args) < 2){
-                                   $this->sendUsage($subcmd, $sender);
-                                   return true;
-                              }
-                              $name = strtolower(array_shift($args));
-                              $cmd = strtolower(implode(" ", $args));
-                              $cmds = $this->getConfig()->get("commands", []);
-                              if(!isset($cmds[$name])){
-                                   $cmds[$name]["cmds"] = [$cmd];
-                                   $cmds[$name]["buycmd"] = "true";
-                                   $this->getConfig()->set("commands", $cmds);
-                                   $this->getConfig()->save();
-                                   $sender->sendMessage(self::PREFIX . TF::GREEN . "Command $name has been successfully added to the list of buyable commands!");
-                                   $sender->sendMessage(self::PREFIX . TF::AQUA . "Infos:");
-                                   $sender->sendMessage(self::PREFIX . "Name: " . $name);
-                                   $sender->sendMessage(self::PREFIX . "Command: " . $cmd);
-                                   $sender->sendMessage(self::PREFIX . "Please set a price now using " . TF::AQUA . "/cshop setprice" . TF::WHITE . ". Or add more commands to be executed using " . TF::AQUA . "/cshop addcmd" . TF::WHITE . ".");
-                              }else{
-                                   $sender->sendMessage(self::ERROR . "That command does already exist!");
-                              }
-                              break;
-                         case "remove":
-                              if(count($args) < 1){
-                                   $this->sendUsage($subcmd, $sender);
-                                   return true;
-                              }
-                              $name = strtolower(array_shift($args));
-                              $cmds = $this->getConfig()->get("commands", []);
-                              if(isset($cmds[$name])){
-                                   unset($cmds[$name]);
-                                   $this->getConfig()->set("commands", $cmds);
-                                   $this->getConfig()->save();
-                                   $sender->sendMessage(self::PREFIX . TF::GREEN . "Command $name has been successfully removed from the list of buyable commands!");
-                              }else{
-                                   $replacers = ["{cmd}" => $name];
-                                   $sender->sendMessage($this->getMessage("command.notfound", $replacers));
-                              }
-                              break;
-                         case "setprice":
-                              if(count($args) < 3){
-                                   $this->sendUsage($subcmd, $sender);
-                                   return true;
-                              }
-                              $cmd = strtolower(array_shift($args));
-                              $type = strtolower(array_shift($args));
-                              if($type === "money"){
-                                   if($this->economy != null){
-                                        $amount = array_shift($args);
-                                        if(!is_numeric($amount)){
-                                             $this->sendUsage($subcmd, $sender);
-                                             return true;
-                                        }
-                                        $cmds = $this->getConfig()->get("commands", []);
-                                        if(isset($cmds[$cmd])){
-                                             $cmds[$cmd]["price"]["paytype"] = "money";
-                                             $cmds[$cmd]["price"]["amount"] = $amount;
-                                             $this->getConfig()->set("commands", $cmds);
-                                             $this->getConfig()->save();
-                                             $unit = $this->economy->getMonetaryUnit();
-                                             $sender->sendMessage(self::PREFIX . TF::GREEN . "The price of $amount $unit has successfully been set to the command $cmd!");
-                                        }else{
-                                             $replacers = ["{cmd}" => $cmd];
-                                             $sender->sendMessage($this->getMessage("command.notfound", $replacers));
-                                        }
-                                   }else{
-                                        $sender->sendMessage(self::ERROR . "Please install EconomyAPI by onebone in order to be able to pay for commands with money!");
-                                   }
-                              }elseif($type === "item"){
-                                   $item = array_shift($args);
-                                   $cmds = $this->getConfig()->get("commands", []);
-                                   if(isset($cmds[$cmd])){
-                                        $cmds[$cmd]["price"]["paytype"] = "item";
-                                        $cmds[$cmd]["price"]["item"] = $item;
-                                        $this->getConfig()->set("commands", $cmds);
-                                        $this->getConfig()->save();
-                                        $sender->sendMessage(self::PREFIX . TF::GREEN . "The item-price of $item has successfully been set to the command $cmd!");
-                                   }else{
-                                        $replacers = ["{cmd}" => $cmd];
-                                        $sender->sendMessage($this->getMessage("command.notfound", $replacers));
-                                   }
-                              }else{
-                                   $this->sendUsage($subcmd, $sender);
-                                   return true;
-                              }
-                              break;
-                         case "sign":
-                              if(!$sender instanceof Player){
-                                   $sender->sendMessage(self::ERROR . "Please use this command in-game!");
-                                   break;
-                              }
-                              if(count($args) < 1){
-                                   $this->sendUsage($subcmd, $sender);
-                                   return true;
-                              }
-                              $cmd = strtolower(array_shift($args));
-                              $cmds = $this->getConfig()->get("commands", []);
-                              if(isset($cmds[$cmd])){
-                                   $this->signsetters[$sender->getName()] = $cmd;
-                                   $sender->sendMessage(self::PREFIX . "Please tap a sign now!");
-                              }else{
-                                   $replacers = ["{cmd}" => $cmd];
-                                   $sender->sendMessage($this->getMessage("command.notfound", $replacers));
-                              }
-                              break;
-                         case "buycmd":
-                              if(count($args) < 2 || ($args[1] !== "true" && $args[1] !== "false")){
-                                   $this->sendUsage($subcmd, $sender);
-                                   return true;
-                              }
-                              $cmds = $this->getConfig()->get("commands", []);
-                              $cmd = strtolower(array_shift($args));
-                              $bool = strtolower(array_shift($args));
-                              if(isset($cmds[$cmd])){
-                                   $cmds[$cmd]["buycmd"] = $bool;
-                                   $this->getConfig()->set("commands", $cmds);
-                                   $this->getConfig()->save();
-                                   $sender->sendMessage(self::PREFIX . "/buycmd has been successfully " . ($bool === "true" ? "enabled" : "disabled") . " for $cmd");
-                              }else{
-                                   $replacers = ["{cmd}" => $cmd];
-                                   $sender->sendMessage($this->getMessage("command.notfound", $replacers));
-                              }
-                              break;
-                         case "addcmd":
-                              $cmds = $this->getConfig()->get("commands", []);
-                              if(count($args) < 2){
-                                   $this->sendUsage($subcmd, $sender);
-                                   return true;
-                              }
-                              $cmd = strtolower(array_shift($args));
-                              $command = strtolower(implode(" ", $args));
-                              if(isset($cmds[$cmd])){
-                                   $cmds[$cmd]["cmds"][] = $command;
-                                   $this->getConfig()->set("commands", $cmds);
-                                   $this->getConfig()->save();
-                                   $sender->sendMessage(self::PREFIX . TF::GREEN . "Successfully added the command to $cmd!");
-                                   $sender->sendMessage(self::PREFIX . TF::AQUA . "Command that was added: " . TF::WHITE . "/" . $command);
-                              }else{
-                                   $replacers = ["{cmd}" => $cmd];
-                                   $sender->sendMessage($this->getMessage("command.notfound", $replacers));
-                              }
-                              break;
-                         case "list":
-                              $cmds = $this->getConfig()->get("commands", []);
-                              if($cmds != []){
-                                   $msg = implode(", ", array_keys($cmds));
-                                   $sender->sendMessage(self::PREFIX . "List of all buyable commands:");
-                                   $sender->sendMessage($msg);
-                              }else{
-                                   $sender->sendMessage(self::ERROR . "You haven't created any buyable commands yet, please create one using " . TF::AQUA . "/cshop add" . TF::WHITE . ".");
-                              }
-                              break;
-                         case "info":
-                              if(count($args) < 1){
-                                   $this->sendUsage($subcmd, $sender);
-                                   return true;
-                              }
-                              $cmdn = strtolower(array_shift($args));
-                              $cmds = $this->getConfig()->get("commands", []);
-                              if(isset($cmds[$cmdn])){
-                                   $cmd = $cmds[$cmdn];
-                                   $sender->sendMessage(self::PREFIX . "Information for the command $cmdn:");
-                                   $commands = "Commands: \n- " . implode("\n- ", $cmd["cmds"]);
-                                   $sender->sendMessage($commands);
-                                   $sender->sendMessage("/buycmd: " . $cmd["buycmd"]);
-                                   if(isset($cmd["price"])){
-                                        $paytype = $cmd["price"]["paytype"];
-                                        if($paytype === "money"){
-                                             $amount = $cmd["price"]["amount"];
-                                             $sender->sendMessage("Paytype: Money (EconomyAPI)");
-                                             $sender->sendMessage("Amount: $amount");
-                                        }elseif($paytype === "item"){
-                                             $item = $cmd["price"]["item"];
-                                             $item = $this->getItem($item);
-                                             $sender->sendMessage("Paytype: Items");
-                                             $sender->sendMessage("Item: " . $item->getName() . " Damage: " . $item->getDamage() . " Amount: " . $item->getCount());
-                                        }else{
-                                             $sender->sendMessage(self::ERROR, "Invalid paytype, please use " . TF::AQUA . "/cshop setprice" . TF::WHITE . " to set the price for this command!");
-                                        }
-                                   }else{
-                                        $sender->sendMessage(self::ERROR, "No price has been set for this command, please use " . TF::AQUA . "/cshop setprice" . TF::WHITE . " to set the price for this command!");
-                                   }
-                              }else{
-                                   $replacers = ["{cmd}" => $cmdn];
-                                   $sender->sendMessage($this->getMessage("command.notfound", $replacers));
-                              }
-                              break;
-                         case "help":
-                              $sender->sendMessage(self::PREFIX . "CommandShop Commands:");
-                              foreach ($this->usages as $cmd => $usage) {
-                                   $sender->sendMessage("/cshop $cmd $usage");
-                              }
-                              $sender->sendMessage("/buycmd <command>\nPlease visit the wiki for this plugin here: https://github.com/BoxOfDevs/CommandShop/wiki for further information.");
-                              break;
-                         default:
-                              return false;
-                    }
-                    break;
                case "buycmd":
                     if(!$sender instanceof Player){
                          $sender->sendMessage(self::ERROR . "Please use this command in-game!");
