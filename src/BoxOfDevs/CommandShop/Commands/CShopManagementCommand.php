@@ -249,6 +249,5 @@ class CShopManagementCommand extends PluginCommand {
                default:
                     return false;
           }
-          break;
      }
 }
