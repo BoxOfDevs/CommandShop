@@ -5,15 +5,6 @@ version: 1.0.0
 main: BoxOfDevs\CommandShop\CommandShop
 api: [3.0.0-ALPHA7, 3.0.0-ALPHA8, 3.0.0-ALPHA9, 3.0.0-ALPHA10, 3.0.0-ALPHA11, 3.0.0-ALPHA12, 3.0.0]
 softdepend: EconomyAPI
-commands: 
-  cshop:
-    description: "Create, manage and remove 'buyable' commands"
-    usage: "/cshop <add|remove|setprice|sign|buycmd|addcmd|list|info|help> <args>"
-    permission: cshop.command.manage
-  buycmd:
-    description: "'Buy' a command"
-    usage: "/buycmd <command>"
-    permission: cshop.buy.command
 permissions:
   cshop:
     default: op
