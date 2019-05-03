@@ -47,7 +47,7 @@ class CommandShop extends PluginBase implements Listener{
           $commands = $this->getConfig()->getAll()["commands"];
           foreach ($commands as $name => $cmd) {
                $cmd["name"] = $name;
-               $this->commands[] = CShopCommand::jsonDeserialize($cmd);
+               $this->commands[] = CShopCommand::jsonDeserialize($cmd, $this);
           }
      }
 
@@ -87,6 +87,7 @@ class CommandShop extends PluginBase implements Listener{
       * When the plugin enables
       */
      public function onEnable(){
+          $this->getLogger()->warning("This is a highly unstable development version not meant for general use, please switch to a stable version unless you know what you are doing!");
           $this->getServer()->getPluginManager()->registerEvents(new CShopListener($this),$this);
           $this->getServer()->getCommandMap()->register("commandshop", new CShopManagementCommand($this));
           $this->saveDefaultConfig();
