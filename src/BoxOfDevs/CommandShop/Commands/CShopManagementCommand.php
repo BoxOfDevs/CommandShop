@@ -70,6 +70,7 @@ class CShopManagementCommand extends PluginCommand {
      public function execute(CommandSender $sender, string $commandLabel, array $args) {
           parent::execute($sender, $commandLabel, $args);
           // TODO: Made subcommand classes
+          if (count($args) === 0) return false;
           $subcmd = strtolower(array_shift($args));
           switch($subcmd){
                case "add":
