@@ -102,6 +102,6 @@ class CShopCommand implements JsonSavable {
           // TODO: Ewwwww what even is this
           if ($plugin === null) throw new \Error("Can't create a CShopCommand object without an instance of CommandShop");
           $paymentMethod = $plugin->getPaymentMethod($data["price"]["paytype"]);
-          return new CShopCommand($data["name"], $data["cmds"], $data["buycmd"], $paymentMethod::jsonDeserialize($data["price"]));
+          return new CShopCommand($data["name"], $data["cmds"], (bool) $data["buycmd"], $paymentMethod::jsonDeserialize($data["price"]));
      }
 }
