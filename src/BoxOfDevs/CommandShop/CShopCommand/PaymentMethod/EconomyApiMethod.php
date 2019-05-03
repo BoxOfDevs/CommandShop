@@ -26,7 +26,7 @@ class EconomyApiMethod implements IPaymentMethod {
 
      public function canAfford(Player $player): bool {
           $economy = $this->getEconomyAPI($player);
-          if ($economy !== false && $economy->myMoney($player) >= $this->price) {
+          if ($economy !== null && $economy->myMoney($player) >= $this->price) {
                return true;
           }
           return false;
@@ -34,7 +34,7 @@ class EconomyApiMethod implements IPaymentMethod {
 
      public function pay(Player $player): bool {
           $economy = $this->getEconomyAPI($player);
-          if($economy !== false && $economy->reduceMoney($player, $this->price) === EconomyAPI::RET_SUCCESS){
+          if($economy !== null && $economy->reduceMoney($player, $this->price) === EconomyAPI::RET_SUCCESS){
                return true;
           }
           return false;
@@ -42,12 +42,12 @@ class EconomyApiMethod implements IPaymentMethod {
 
      /**
       * @param Player $player
-      * @return bool|EconomyAPI
+      * @return ?EconomyAPI
       */
-     private function getEconomyAPI(Player $player) {
+     private function getEconomyAPI(Player $player): ?EconomyAPI {
           if ($player->getServer()->getPluginManager()->getPlugin("EconomyAPI") === null) {
                $player->getServer()->getLogger()->error("CommandShop detected an attempt to use EconomyAPI, but the plugin isn't installed!");
-               return false;
+               return null;
           }
           return EconomyAPI::getInstance();
      }
