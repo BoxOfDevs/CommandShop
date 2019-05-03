@@ -45,7 +45,7 @@ class CommandShop extends PluginBase implements Listener{
      }
 
      public function loadCSCommands(): void {
-          $commands = $this->getConfig()->getAll()["commands"];
+          $commands = $this->getConfig()->get("commands", []);
           foreach ($commands as $name => $cmd) {
                $cmd["name"] = $name;
                $this->commands[$name] = CShopCommand::jsonDeserialize($cmd, $this);
@@ -53,7 +53,7 @@ class CommandShop extends PluginBase implements Listener{
      }
 
      public function saveCSCommands() {
-          $this->getConfig()->set("commands_new", json_encode($this->commands));
+          $this->getConfig()->set("commands", json_decode(json_encode($this->commands), true));
           $this->getConfig()->save();
      }
 
@@ -66,7 +66,7 @@ class CommandShop extends PluginBase implements Listener{
           return $this->commands[$name];
      }
 
-     public function setCSCommand(string $name, CShopCommand $command, bool $save = false): void {
+     private function setCSCommand(string $name, CShopCommand $command, bool $save = false): void {
           $this->commands[$name] = $command;
           if ($save) $this->saveCSCommands();
      }
