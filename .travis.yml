@@ -1,15 +1,12 @@
 #Travis CI
 
-dist: trusty
+dist: xenial
 sudo: false
 
 language: php
 
 php:
  - 7.0
-
-branches:
- - master
 
 script:
  - curl -o Travis.sh 'https://cloud.himbeer.me/bod/travisgen.php?slug='$TRAVIS_REPO_SLUG'&type=shell'
