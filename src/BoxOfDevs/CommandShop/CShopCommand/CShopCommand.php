@@ -90,12 +90,12 @@ class CShopCommand implements JsonSavable {
      }
 
      public function jsonSerialize(): array {
-          return json_encode([
+          return [
                "name" => $this->name,
                "cmds" => $this->cmds,
                "buycmd" => $this->buyCmdEnabled,
                "price" => $this->paymentMethod
-          ]);
+          ];
      }
 
      public static function jsonDeserialize(array $data, CommandShop $plugin = null): CShopCommand {
