@@ -9,10 +9,10 @@ use pocketmine\Player;
 use onebone\economyapi\EconomyAPI;
 
 class EconomyApiMethod implements IPaymentMethod {
-     /** @var integer */
+     /** @var float */
      private $price;
 
-     public function __construct(int $price) {
+     public function __construct(float $price) {
           $this->price = $price;
      }
 
