@@ -89,8 +89,13 @@ class ItemMethod implements IPaymentMethod {
 
      public static function jsonDeserialize(array $data): ItemMethod {
           $tempItems = [];
-          foreach ($data["items"] as $item) {
-               $tempItems[] = Item::jsonDeserialize($item);
+          if (isset($data["items"])) {
+               foreach ($data["items"] as $item) {
+                    $tempItems[] = Item::jsonDeserialize($item);
+               }
+          }
+          if (isset($data["item"])) { // Legacy config
+               $tempItems[] = Item::fromString($data["item"]);
           }
           return new ItemMethod($tempItems);
      }
