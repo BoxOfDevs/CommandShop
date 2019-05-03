@@ -11,6 +11,7 @@ use BoxOfDevs\CommandShop\CShopCommand\PaymentMethod\ItemMethod;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginCommand;
 use pocketmine\item\Item;
+use pocketmine\network\mcpe\protocol\types\CommandOutputMessage;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat as TF;
 
@@ -70,7 +71,7 @@ class CShopManagementCommand extends PluginCommand {
      public function execute(CommandSender $sender, string $commandLabel, array $args) {
           parent::execute($sender, $commandLabel, $args);
           // TODO: Made subcommand classes
-          if (count($args) === 0) return false;
+          if (count($args) === 0) {$sender->sendMessage($this->getUsage()); return false;};
           $subcmd = strtolower(array_shift($args));
           switch($subcmd){
                case "add":
@@ -123,7 +124,7 @@ class CShopManagementCommand extends PluginCommand {
                                    $this->sendUsage($subcmd, $sender);
                                    return true;
                               }
-                              $method = new EconomyApiMethod($amount);
+                              $method = new EconomyApiMethod((float) $amount);
                               $cmd->setPaymentMethod($method);
                               $this->plugin->saveCSCommands();
                               $sender->sendMessage(CommandShop::PREFIX . TF::GREEN . "The price of $amount has successfully been set to the command $name!");
@@ -220,24 +221,22 @@ class CShopManagementCommand extends PluginCommand {
                     $sender->sendMessage(CommandShop::PREFIX . "Information for the command $name:");
                     $commands = "Commands: \n- " . implode("\n- ", $cmd->getCmds());
                     $sender->sendMessage($commands);
-                    $sender->sendMessage("/buycmd: " . $cmd->getBuyCmdEnabled());
+                    $sender->sendMessage("/buycmd: " . ($cmd->getBuyCmdEnabled() ? "enabled" : "disabled"));
                     $method = $cmd->getPaymentMethod();
                     if($method !== null){
-                         $paytype = $method->getName();
-                         if($paytype === "money"){
-                              $amount =
+                         if($method instanceof  EconomyApiMethod){
+                              $amount = $method->getPriceString();
                               $sender->sendMessage("Paytype: Money (EconomyAPI)");
                               $sender->sendMessage("Amount: $amount");
-                         }elseif($paytype === "item"){
-                              $item = $cmd["price"]["item"];
-                              $item = $this->getItem($item);
+                         }elseif($method instanceof  ItemMethod){
+                              $items = $method->getPriceString();
                               $sender->sendMessage("Paytype: Items");
-                              $sender->sendMessage("Item: " . $item->getName() . " Damage: " . $item->getDamage() . " Amount: " . $item->getCount());
+                              $sender->sendMessage("Items: $items");
                          }else{
-                              $sender->sendMessage(self::ERROR, "Invalid paytype, please use " . TF::AQUA . "/cshop setprice" . TF::WHITE . " to set the price for this command!");
+                              $sender->sendMessage(CommandShop::ERROR . "Invalid paytype, please use " . TF::AQUA . "/cshop setprice" . TF::WHITE . " to set the price for this command!");
                          }
                     }else{
-                         $sender->sendMessage(self::ERROR, "No price has been set for this command, please use " . TF::AQUA . "/cshop setprice" . TF::WHITE . " to set the price for this command!");
+                         $sender->sendMessage(CommandShop::ERROR . "No price has been set for this command, please use " . TF::AQUA . "/cshop setprice" . TF::WHITE . " to set the price for this command!");
                     }
                     break;
                case "help":
