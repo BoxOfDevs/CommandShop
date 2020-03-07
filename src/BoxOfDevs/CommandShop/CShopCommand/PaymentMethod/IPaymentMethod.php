@@ -9,7 +9,7 @@ use pocketmine\Player;
 
 interface IPaymentMethod extends JsonSavable {
      /**
-      * Get the name that stands under price->paytype in the serialized json
+      * Get the name used for price->paytype in the serialized json
       *
       * @return string
       */
