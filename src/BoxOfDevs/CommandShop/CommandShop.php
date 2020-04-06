@@ -173,8 +173,14 @@ class CommandShop extends PluginBase implements Listener{
                $cmds = $this->getConfig()->get("commands", []);
                if(isset($cmds[$cmd])){
                     $cmda = $cmds[$cmd];
-                    $commands = $cmda["cmds"];
+                    if (!isset($cmda["price"])) {
+						$msg = self::ERROR . "Command couldn't be bought because the price isn't set!";
+						$this->getLogger()->warning($msg);
+						$p->sendMessage($msg . $this->getMessage("buy.contactadmin"));
+						return false;
+					}
                     $price = $cmda["price"];
+				   	$commands = $cmda["cmds"];
                     if($price["paytype"] === "money"){
                          if($this->economy != null){
                               $amount = $price["amount"];
