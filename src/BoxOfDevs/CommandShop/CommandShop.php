@@ -17,10 +17,12 @@ class CommandShop extends PluginBase implements Listener{
      const PREFIX = TF::YELLOW . "[CommandShop]" . TF::WHITE . " ";
      const ERROR = TF::YELLOW . "[CommandShop]" . TF::RED . " [ERROR]" . TF::WHITE . " ";
 
-     protected $economy;
-     public $signsetters = [];
-     public $confirms = [];
-     protected $usages = [
+	/**
+	 * @var EconomyAPI
+	 */
+     private $economy;
+
+     private $usages = [
           "add" => "<name> <command>",
           "remove" => "<name>",
           "setprice" => "<name> <money|item> <money-amount|item-id>",
@@ -31,6 +33,9 @@ class CommandShop extends PluginBase implements Listener{
           "info" => "<name>",
           "help" => ""
      ];
+
+	public $signsetters = [];
+	public $confirms = [];
 
      /**
       * When the plugin enables
@@ -73,7 +78,7 @@ class CommandShop extends PluginBase implements Listener{
       * @param        $p
       * @return string
       */
-     public function sendUsage(string $cmd, $p): string{
+     public function sendUsage(string $cmd, CommandSender $p): string{
           $p->sendMessage(self::ERROR . "Usage: /cshop $cmd " . $this->usages[$cmd]);
           return true;
      }
@@ -404,10 +409,10 @@ class CommandShop extends PluginBase implements Listener{
                                              $sender->sendMessage("Paytype: Items");
                                              $sender->sendMessage("Item: " . $item->getName() . " Damage: " . $item->getDamage() . " Amount: " . $item->getCount());
                                         }else{
-                                             $sender->sendMessage(self::ERROR, "Invalid paytype, please use " . TF::AQUA . "/cshop setprice" . TF::WHITE . " to set the price for this command!");
+                                             $sender->sendMessage(self::ERROR . "Invalid paytype, please use " . TF::AQUA . "/cshop setprice" . TF::WHITE . " to set the price for this command!");
                                         }
                                    }else{
-                                        $sender->sendMessage(self::ERROR, "No price has been set for this command, please use " . TF::AQUA . "/cshop setprice" . TF::WHITE . " to set the price for this command!");
+                                        $sender->sendMessage(self::ERROR . "No price has been set for this command, please use " . TF::AQUA . "/cshop setprice" . TF::WHITE . " to set the price for this command!");
                                    }
                               }else{
                                    $replacers = ["{cmd}" => $cmdn];
