@@ -16,7 +16,11 @@ class CShopListener implements Listener {
 	 */
 	private $cs;
 	/**
-	 * @var string[]
+	 * @var int[]
+	 */
+	public $confirms = [];
+	/**
+	 * @var float[]
 	 */
 	private $interactCooldowns = [];
 
@@ -74,16 +78,16 @@ class CShopListener implements Listener {
 			foreach ($signs as $index => $s) {
 				if ($s["posx"] === $x && $s["posy"] === $y && $s["posz"] === $z && $s["level"] === $level) {
 					if ($p->hasPermission("cshop.buy.sign")) {
-						if (isset($this->cs->confirms[$p->getName()])) {
-							if ($this->cs->confirms[$p->getName()] === $index) {
+						if (isset($this->confirms[$p->getName()])) {
+							if ($this->confirms[$p->getName()] === $index) {
 								$this->cs->buyCmd($s["cmd"], $p);
-								unset($this->cs->confirms[$p->getName()]);
+								unset($this->confirms[$p->getName()]);
 								return;
 							} else {
-								unset($this->cs->confirms[$p->getName()]);
+								unset($this->confirms[$p->getName()]);
 							}
 						}
-						$this->cs->confirms[$p->getName()] = $index;
+						$this->confirms[$p->getName()] = $index;
 						$replacers = ["{cmd}" => $s["cmd"]];
 						$p->sendMessage($this->cs->getMessage("sign.confirm", $replacers));
 					} else {
