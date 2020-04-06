@@ -7,6 +7,7 @@ use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\command\ConsoleCommandSender;
 use pocketmine\event\Listener;
+use pocketmine\inventory\BaseInventory;
 use pocketmine\item\Item;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
@@ -131,35 +132,36 @@ class CommandShop extends PluginBase implements Listener{
           return;
      }
 
-     /**
-      * Removes an item from a player's invenotry (solving count issues with soft)
-      *
-      * @param Item                                $item
-      * @param \pocketmine\inventory\BaseInventory $inventory
-      */
-     public function remove(Item $item, \pocketmine\inventory\BaseInventory $inventory){
-        $checkDamage = !$item->hasAnyDamageValue();
-        $checkTags = $item->hasCompoundTag();
-        $checkCount = $item->getCount() === null ? false : true;
-        $count = $item->getCount();
+	/**
+	 * Removes an item from a player's inventory (solving count issues with soft)
+	 *
+	 * @param Item			$item
+	 * @param BaseInventory	$inventory
+	 */
+	private function remove(Item $item, BaseInventory $inventory){
+		$checkDamage = !$item->hasAnyDamageValue();
+		$checkTags = $item->hasCompoundTag();
+		$checkCount = $item->getCount() === null ? false : true;
+		$count = $item->getCount();
+		foreach($inventory->getContents() as $index => $i){
+			if($item->equals($i, $checkDamage, $checkTags)){
+				if($checkCount && $i->getCount() > $count) {
+					$i->setCount($i->getCount() - $count);
+					$inventory->setItem($index, $i);
+					return;
+				} elseif($checkCount && $i->getCount() < $count) {
+					$count -= $i->getCount();
+					$inventory->clear($index);
+				} else {
+					$inventory->clear($index);
+					return;
+				}
+			}
+		}
+	}
 
-        foreach($inventory->getContents() as $index => $i){
-            if($item->equals($i, $checkDamage, $checkTags)){
-                if($checkCount && $i->getCount() > $item->getCount()) {
-                    $i->setCount($i->getCount() - $count);
-                    $inventory->setItem($index, $i);
-                    return;
-                } elseif($checkCount && $i->getCount() < $item->getCount()) {
-                    $count -= $i->getCount();
-                    $inventory->clear($index);
-                } else {
-                    $inventory->clear($index);
-                }
-            }
-        }
-    }
 
-     /**
+	/**
       * Buy a command
       *
       * @param string $cmd
