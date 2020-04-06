@@ -11,8 +11,14 @@ use pocketmine\utils\TextFormat as TF;
 
 class CShopListener implements Listener {
 
-	protected $cs;
-	protected $interactCooldowns = [];
+	/**
+	 * @var CommandShop
+	 */
+	private $cs;
+	/**
+	 * @var string[]
+	 */
+	private $interactCooldowns = [];
 
 	public function __construct(CommandShop $cs) {
 		$this->cs = $cs;

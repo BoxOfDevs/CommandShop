@@ -19,7 +19,7 @@ class CommandShop extends PluginBase implements Listener {
 	const ERROR = TF::YELLOW . "[CommandShop]" . TF::RED . " [ERROR]" . TF::WHITE . " ";
 
 	/**
-	 * @var EconomyAPI
+	 * @var EconomyAPI|null
 	 */
 	private $economy;
 
@@ -35,7 +35,13 @@ class CommandShop extends PluginBase implements Listener {
 		"help" => ""
 	];
 
+	/**
+	 * @var string[]
+	 */
 	public $signsetters = [];
+	/**
+	 * @var string[]
+	 */
 	public $confirms = [];
 
 	/**
@@ -75,13 +81,11 @@ class CommandShop extends PluginBase implements Listener {
 	/**
 	 * Send the usage of a Command to a Player
 	 *
-	 * @param string $cmd
-	 * @param        $p
-	 * @return string
+	 * @param string 		$cmd
+	 * @param CommandSender $p
 	 */
-	public function sendUsage(string $cmd, CommandSender $p): string {
+	public function sendUsage(string $cmd, CommandSender $p) {
 		$p->sendMessage(self::ERROR . "Usage: /cshop $cmd " . $this->usages[$cmd]);
-		return true;
 	}
 
 	/**
@@ -107,7 +111,7 @@ class CommandShop extends PluginBase implements Listener {
 		if (!is_numeric($name)) {
 			$item = Item::fromString($name);
 		} else {
-			$item = Item::get($name);
+			$item = Item::get((int) $name);
 		}
 		$item->setDamage($dmg);
 		$item->setCount($count);
@@ -123,9 +127,9 @@ class CommandShop extends PluginBase implements Listener {
 	public function executeCommands(array $cmds, Player $p) {
 		$cmds = str_replace("{player}", '"' . $p->getName() . '"', $cmds);
 		$cmds = str_replace("{level}", $p->getLevel()->getName(), $cmds);
-		$cmds = str_replace("{x}", round($p->x, 0), $cmds);
-		$cmds = str_replace("{y}", round($p->y, 0), $cmds);
-		$cmds = str_replace("{z}", round($p->z, 0), $cmds);
+		$cmds = str_replace("{x}", (string) round($p->x, 0), $cmds);
+		$cmds = str_replace("{y}", (string) round($p->y, 0), $cmds);
+		$cmds = str_replace("{z}", (string) round($p->z, 0), $cmds);
 		foreach ($cmds as $cmd) {
 			$this->getServer()->dispatchCommand(new ConsoleCommandSender(), $cmd);
 		}
@@ -141,15 +145,14 @@ class CommandShop extends PluginBase implements Listener {
 	private function remove(Item $item, BaseInventory $inventory) {
 		$checkDamage = !$item->hasAnyDamageValue();
 		$checkTags = $item->hasCompoundTag();
-		$checkCount = $item->getCount() === null ? false : true;
 		$count = $item->getCount();
 		foreach ($inventory->getContents() as $index => $i) {
 			if ($item->equals($i, $checkDamage, $checkTags)) {
-				if ($checkCount && $i->getCount() > $count) {
+				if ($i->getCount() > $count) {
 					$i->setCount($i->getCount() - $count);
 					$inventory->setItem($index, $i);
 					return;
-				} elseif ($checkCount && $i->getCount() < $count) {
+				} elseif ($i->getCount() < $count) {
 					$count -= $i->getCount();
 					$inventory->clear($index);
 				} else {
